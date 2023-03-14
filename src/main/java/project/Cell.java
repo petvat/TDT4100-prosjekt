@@ -10,9 +10,9 @@ public class Cell extends Button {
     private boolean isMine;
     private boolean isFlagged;
     private boolean isRevealed;
-    private int cellSize;
     private Board board;
     private int mineCounter;
+    private List<CellListener> listeners = new ArrayList<>();
     // ein grid av hosliggande celler, der (0, 0) er cella som vert trykka på
     private int[] adjacents = new int[] {
             -1, -1,
@@ -35,6 +35,7 @@ public class Cell extends Button {
         findAdjacents().stream()
                 .filter(Cell::isMine)
                 .forEach(adjacent -> mineCounter++);
+
     }
 
     public void setBoard(Board board) {
@@ -61,23 +62,6 @@ public class Cell extends Button {
         return isMine;
     }
 
-    public int getY() {
-        return y;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void flag() {
-        if (!isFlagged) {
-            isFlagged = true;
-            board.getCounter().remove();
-        } else if (isFlagged) {
-            isFlagged = false;
-            board.getCounter().addTo();
-        }
-    }
 
     private boolean isValidCoordinate(int pos, int max) {
         return (pos >= 0 && pos < max);
@@ -134,10 +118,27 @@ public class Cell extends Button {
 
         // update check isRevealed
     }
+
+    public void flag() {
+        if (!isFlagged) {
+            isFlagged = true;
+            board.getCounter().remove();
+        } else if (isFlagged) {
+            isFlagged = false;
+            board.getCounter().addTo();
+        }
+        update();
+    }
     // kanskje updateGUI(Cell cell) i controller
 
-    // Kor skal denne vere, det store spørsmålet
     public void update() {
+        for (CellListener listener : listeners) {
+            listener.cellChanged(this);
+        }
+    }
+
+    // Kor skal denne vere, det store spørsmålet
+    public void update1() {
         // Ok så reveal() og flag() må vere så enkle som mogleg
         // Kan bruke cell extends Button
         // ha her:
@@ -157,6 +158,8 @@ public class Cell extends Button {
             setText("");
         }
     }
+
+    // public void cellChanged ikkje nødvending, berre ein listener
 }
 
 // @FXML doSomething()

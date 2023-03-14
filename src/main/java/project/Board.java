@@ -1,6 +1,6 @@
 package project;
 
-public class Board {
+public class Board implements CellListener{
 
     private static final int VH = 800;
     private static final int VW = 800;
@@ -53,4 +53,11 @@ public class Board {
     public MineCounter getCounter() {
         return counter;
     }
+
+    @Override
+    public void cellChanged(Cell cell) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'cellChanged'");
+    }
+
 }
