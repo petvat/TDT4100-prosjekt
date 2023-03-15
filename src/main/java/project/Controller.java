@@ -64,12 +64,12 @@ public class Controller implements Initializable, CellListener {
         // get Values
 
         Board bd = new Board(Y_SIZE, X_SIZE);
-        bd.init("EASY");
+        bd.init("NORMAL");
 
         // skal berre lage buttons til cells
 
-        for (int y = 0; y < bd.getRows() - 1; y++) {
-            for (int x = 0; x < bd.getCols() - 1; x++) {
+        for (int y = 0; y < bd.getRows(); y++) {
+            for (int x = 0; x < bd.getCols(); x++) {
                 // btn
                 // Må sette -2 fordi stroke tar 1px
                 Rectangle btn = new Rectangle(CELL_SIZE - 2, CELL_SIZE - 2);
@@ -83,7 +83,7 @@ public class Controller implements Initializable, CellListener {
 
                 // 2 lag
                 StackPane stack = new StackPane(btn, txt);
-                //stack.setMaxSize(40, 40);
+                // stack.setMaxSize(40, 40);
                 // temp hardcode
                 // customisation
 

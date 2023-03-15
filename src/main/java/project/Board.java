@@ -6,7 +6,7 @@ public class Board implements CellListener {
 
     private Cell[][] grid;
     // density (!)
-    private double mineDensity = 0.005;
+    private double mineDensity = 0.2;
     private int minesTotal;
     private int minesLeft;
     private int cellSize;
@@ -22,15 +22,15 @@ public class Board implements CellListener {
     public void init(String difficulty) {
         switch (difficulty.toUpperCase()) {
             case "EASY":
-                mineDensity = 0.005;
+                mineDensity = 0.1;
             case "NORMAL":
-                mineDensity = 0.005;
+                mineDensity = 0.1;
             case "HARD":
-                mineDensity = 0.05;
+                mineDensity = 0.1;
         }
         // sett opp grid og legg til mine
-        for (int y = 0; y < getRows() - 1; y++) {
-            for (int x = 0; x < getCols() - 1; x++) {
+        for (int y = 0; y < getRows(); y++) {
+            for (int x = 0; x < getCols(); x++) {
                 Cell cell = new Cell(y, x, Math.random() <= mineDensity);
                 grid[y][x] = cell;
                 cell.setBoard(this);

@@ -42,7 +42,7 @@ public class Cell {
                 1, 0,
                 1, 1
         };
-        for (int i = 0; i < adjacentPoints.length; i += 2) {
+        for (int i = 0; i < adjacentPoints.length - 1; i += 2) {
             int dy = adjacentPoints[i];
             int dx = adjacentPoints[i + 1];
 
@@ -50,6 +50,9 @@ public class Cell {
             int adjacentX = this.x + dx;
 
             // trur problem er at siste row ikkje vert laga
+
+            // PROBLEM OPPSTÅR NÅR SISTE ROW
+
             if (board.isValidCoordinate(adjacentY, adjacentX)) {
                 Cell cell = board.getCellAt(adjacentY, adjacentX);
                 if (cell.isMine())
@@ -119,7 +122,8 @@ public class Cell {
 
         if (this.adjacentMineCount == 0) {
             for (Cell adjacent : this.adjacents) {
-                adjacent.reveal();
+                if (!adjacent.isRevealed)
+                    adjacent.reveal();
             }
         }
         // LAMBDA
