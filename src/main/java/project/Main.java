@@ -6,8 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class MinesweeperApp extends Application {
-
+public class Main extends Application {
+    // gi nåde i start
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load((getClass().getResource("/project/GameScene1.fxml")));

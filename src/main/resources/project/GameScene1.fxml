@@ -10,12 +10,12 @@
 
 <AnchorPane id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.Controller">
    <children>
-      <BorderPane id="border" fx:id="border" prefHeight="400.0" prefWidth="600.0">
+      <BorderPane id="border" fx:id="border" prefHeight="800.0" prefWidth="600.0">
          <top>
             <HBox id="top" prefHeight="27.0" prefWidth="600.0" BorderPane.alignment="CENTER">
                <children>
                   <Region prefHeight="48.0" prefWidth="32.0" />
-                  <Text id="timer" strokeType="OUTSIDE" strokeWidth="0.0" text="Timer:" wrappingWidth="66.64322280883789">
+                  <Text id="timer" fx:id="timer" strokeType="OUTSIDE" strokeWidth="0.0" text="Timer:" wrappingWidth="66.64322280883789">
                      <font>
                         <Font size="17.0" />
                      </font>
@@ -25,7 +25,7 @@
                   <Region prefHeight="23.0" prefWidth="79.0" />
                   <Button id="reset" mnemonicParsing="false" onAction="#reset" text="Reset" />
                   <Region prefHeight="48.0" prefWidth="112.0" />
-                  <Text id="mineCount" strokeType="OUTSIDE" strokeWidth="0.0" text="Mines:" wrappingWidth="96.13671267032623">
+                  <Text id="mineCount" fx:id="mineCount" strokeType="OUTSIDE" strokeWidth="0.0" text="Mines:" wrappingWidth="96.13671267032623">
                      <font>
                         <Font size="17.0" />
                      </font>

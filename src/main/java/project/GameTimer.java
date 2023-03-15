@@ -1,15 +1,21 @@
 package project;
 
-import java.util.Timer;
 
 public class GameTimer {
+    private int seconds;
+    private int cap;
 
-    private Timer timer;
-    private int seconds = 0;
+    public GameTimer(int start, int cap) {
+        this.seconds = start;
+        this.cap = cap;
+    }
 
-    public void startTimer() {
-        timer = new Timer();
-        
+    public void runTimer() {
+        if (seconds < cap)
+            seconds++;
     }
     
+    public int getCurrent() {
+        return seconds;
+    }
 }

@@ -87,4 +87,79 @@ public class Board1 {
         counter = new MineCounter(mines);
     }
 
+    // BOSSBIBLIOTEK
+// Kor skal denne vere, det store spørsmålet
+    // SCRAPPED
+    /*
+     * public void update1() {
+     * // Ok så reveal() og flag() må vere så enkle som mogleg
+     * // Kan bruke cell extends Button
+     * // ha her:
+     * // if change in cell (isRevealed etc)
+     * // change visual frå button stuff
+     * if (isRevealed() && isMine()) {
+     * setText("X");
+     * // change color
+     * } else if (isRevealed()) {
+     * if (mineCounter > 0) {
+     * setText(Integer.toString(mineCounter));
+     * // change color
+     * }
+     * } else if (isFlagged()) {
+     * setText("F");
+     * } else if (!isFlagged()) {
+     * setText("");
+     * }
+     * }
+     */
+    // public void cellChanged ikkje nødvending, berre ein listener
+    /*
+     * private boolean isValidCoordinate(int pos, int max) {
+     * return (pos >= 0 && pos < max);
+     * }
+     */
+
+    /*
+     * public int adjacentMineCount() {
+     * this.mineCounter = 0;
+     * // clunky
+     * // før findAdjacents()
+     * adjacents.stream()
+     * .filter(Cell::isMine)
+     * .forEach(adjacent -> this.mineCounter++);
+     * //
+     * return this.mineCounter;
+     * }
+     */
+
+       /*
+     * public void createButton() {
+     * 
+     * }
+     * 
+     * public void handleFlagging(Cell cell, Button btn) {
+     * cell.flag();
+     * }
+     * 
+     * public void handleRevealing(Cell cell, Button btn) {
+     * cell.reveal();
+     * }
+     * 
+     * public void setBtnFlagged(Button btn) {
+     * btn.setStyle("-fx-background-color: red;");
+     * }
+     * 
+     * public void setBtnRevealed(Button btn, Cell cell) {
+     * String mineCount = Integer.toString(cell.reveal());
+     * 
+     * cell.reveal();
+     * btn.setText(mineCount);
+     * btn.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
+     * }
+     * 
+     * 
+     * public void handleMineCountChange(Board board) {
+     * // getCount()
+     * }
+     */
 }
