@@ -1,31 +1,56 @@
 package project;
 
-public class Board implements CellListener{
+import java.util.Arrays;
 
-    private static final int VH = 800;
-    private static final int VW = 800;
-    private static final int CELL_SIZE = 40;
-    private static final int CELLS_PX = VW / CELL_SIZE;
-    private static final int CELLS_PY = VH / CELL_SIZE;
+public class Board implements CellListener {
 
-    private Cell[][] grid = new Cell[CELLS_PY][CELLS_PX];
+    private Cell[][] grid;
     // density (!)
-    private double mineDensity = 0.2;
-    private int mineTotal;
+    private double mineDensity = 0.005;
+    private int minesTotal;
     private int minesLeft;
+    private int cellSize;
     private MineCounter counter;
 
-    public Board() {
-        int mines = 0;
-        for (int y = 0; y < CELL_SIZE; y++) {
-            for (int x = 0; x < CELL_SIZE; x++) {
-                Cell cell = new Cell(y, x, Math.random() < mineDensity);
-                cell.setBoard(this);
+    // UTILS
+
+    public Board(int ySize, int xSize) {
+        grid = new Cell[ySize][xSize];
+    }
+
+    // init board with difficulty
+    public void init(String difficulty) {
+        switch (difficulty.toUpperCase()) {
+            case "EASY":
+                mineDensity = 0.005;
+            case "NORMAL":
+                mineDensity = 0.005;
+            case "HARD":
+                mineDensity = 0.05;
+        }
+        // sett opp grid og legg til mine
+        for (int y = 0; y < getRows() - 1; y++) {
+            for (int x = 0; x < getCols() - 1; x++) {
+                Cell cell = new Cell(y, x, Math.random() <= mineDensity);
                 grid[y][x] = cell;
-                mines++;
+                cell.setBoard(this);
+                if (cell.isMine())
+                    minesTotal++;
             }
         }
-        counter = new MineCounter(mines);
+
+        // finn hosliggande celler til celle
+
+    }
+
+    /*
+     * private boolean isValidCoordinate(int pos, int max) {
+     * return (pos >= 0 && pos < max);
+     * }
+     */
+
+    public boolean isValidCoordinate(int y, int x) {
+        return (y >= 0 && y < grid.length && x >= 0 && x < grid[y].length);
     }
 
     public Cell[][] getGrid() {
@@ -36,16 +61,16 @@ public class Board implements CellListener{
         return grid[y][x];
     }
 
-    public int getRowLength() {
+    public int getRows() {
         return grid.length;
     }
 
-    public int getColLength() {
+    public int getCols() {
         return grid[0].length;
     }
 
     public int getCellSize() {
-        return CELL_SIZE;
+        return cellSize;
     }
 
     // MINECOUNTING

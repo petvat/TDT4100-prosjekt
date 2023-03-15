@@ -1,16 +1,23 @@
 package project;
 
-public class MinesweeperApp {
-    private static final int VH = 800;
-    private static final int VW = 800;
-    private static final int CELL_SIZE = 40;
-    private static final int CELLS_PX = VW/CELL_SIZE;
-    private static final int CELLS_PY = VH/CELL_SIZE;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
+public class MinesweeperApp extends Application {
 
-    public static int getCellSize() {
-        return CELL_SIZE;
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        Parent root = FXMLLoader.load((getClass().getResource("/project/GameScene1.fxml")));
+        primaryStage.setTitle("MinesweeperFX");
+        primaryStage.setScene(new Scene(root, 800, 800));
+        primaryStage.show();
     }
 
-    
+    public static void main(String[] args) {
+        launch(args);
+    }
+
 }
