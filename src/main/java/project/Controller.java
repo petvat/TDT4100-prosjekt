@@ -24,9 +24,6 @@ import javafx.scene.text.Text;
 // CONTROLLER FOR NYTT GAME
 
 public class Controller implements Initializable, CellListener {
-
-    private Map<Cell, StackPane> cellMap = new HashMap<Cell, StackPane>();
-
     private static final int VH = 800;
     private static final int VW = 800;
     private static final int CELL_SIZE = 40;
@@ -34,6 +31,7 @@ public class Controller implements Initializable, CellListener {
     private static final int Y_SIZE = VH / CELL_SIZE;
 
     private int time = 0;
+    private Map<Cell, StackPane> cellMap = new HashMap<Cell, StackPane>();
 
     @FXML
     private AnchorPane root;
@@ -79,11 +77,13 @@ public class Controller implements Initializable, CellListener {
         // Lag Cell-grafikk
         for (int y = 0; y < bd.getRows(); y++) {
             for (int x = 0; x < bd.getCols(); x++) {
+
+                // DEL INN I NY CLASS?
                 // Må sette -2 fordi stroke tar 1px
                 Rectangle btn = new Rectangle(CELL_SIZE - 2, CELL_SIZE - 2);
                 Text txt = new Text();
 
-                // default utsjånad
+                // Default utsjånad
                 btn.setFill(Color.GRAY);
                 btn.setStroke(Color.LIGHTGRAY);
                 txt.setFill(Color.DARKGRAY);
@@ -114,9 +114,7 @@ public class Controller implements Initializable, CellListener {
                     btn.setTranslateX(0);
                     btn.setTranslateY(0);
                 });
-
                 grid.add(stack, y, x);
-
             }
         }
         border.setCenter(grid);

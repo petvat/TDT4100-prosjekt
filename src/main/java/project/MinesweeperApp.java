@@ -6,7 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class Main extends Application {
+public class MinesweeperApp extends Application {
     // gi nåde i start
     @Override
     public void start(Stage primaryStage) throws Exception {
