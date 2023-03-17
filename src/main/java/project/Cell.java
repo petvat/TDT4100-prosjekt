@@ -21,11 +21,14 @@ public class Cell {
         isFlagged = false;
         adjacents = new ArrayList<>();
         listeners = new ArrayList<>();
-
     }
 
     public void setBoard(Board board) {
         this.board = board;
+    }
+
+    public Board getBoard() {
+        return board;
     }
 
     public void computeAdjacents() {
@@ -47,7 +50,8 @@ public class Cell {
             int adjacentY = this.y + dy;
             int adjacentX = this.x + dx;
 
-            // Sjekk om Cell gitt ved adjacentY/X finst, viss ja, legg til i liste av hosliggande celler
+            // Sjekk om Cell gitt ved adjacentY/X finst, viss ja, legg til i liste av
+            // hosliggande celler
             if (board.isValidCoordinate(adjacentY, adjacentX)) {
                 Cell cell = board.getCellAt(adjacentY, adjacentX);
                 if (cell.isMine())

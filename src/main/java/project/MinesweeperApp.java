@@ -8,16 +8,17 @@ import javafx.stage.Stage;
 
 public class MinesweeperApp extends Application {
     // gi nåde i start
+    // VH, VW, CELL_SIZE
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load((getClass().getResource("/project/GameScene1.fxml")));
         primaryStage.setTitle("MinesweeperFX");
-        primaryStage.setScene(new Scene(root, 800, 800));
+        primaryStage.setScene(new Scene(root, Controller.VW, Controller.VH));
         primaryStage.show();
     }
 
+    // EIGE GAME CLASS?
     public static void main(String[] args) {
         launch(args);
     }
-
 }

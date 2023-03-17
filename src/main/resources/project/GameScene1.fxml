@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -12,19 +13,17 @@
    <children>
       <BorderPane id="border" fx:id="border" prefHeight="800.0" prefWidth="600.0">
          <top>
-            <HBox id="top" prefHeight="27.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+            <HBox id="top" prefHeight="27.0" prefWidth="328.0" BorderPane.alignment="CENTER">
                <children>
-                  <Region prefHeight="48.0" prefWidth="32.0" />
-                  <Text id="timer" fx:id="timer" strokeType="OUTSIDE" strokeWidth="0.0" text="Timer:" wrappingWidth="66.64322280883789">
+                  <Text id="timer" fx:id="timer" strokeType="OUTSIDE" strokeWidth="0.0" text="Timer:" wrappingWidth="101.97653579711914">
                      <font>
                         <Font size="17.0" />
                      </font>
                   </Text>
-                  <Region prefHeight="48.0" prefWidth="121.0" />
+                  <ComboBox fx:id="comboBox" prefHeight="25.0" prefWidth="150.0" />
+                  <Region prefHeight="27.0" prefWidth="9.0" />
                   <Button id="save" mnemonicParsing="false" onAction="#save" text="Save" />
-                  <Region prefHeight="23.0" prefWidth="79.0" />
                   <Button id="reset" mnemonicParsing="false" onAction="#reset" text="Reset" />
-                  <Region prefHeight="48.0" prefWidth="112.0" />
                   <Text id="mineCount" fx:id="mineCount" strokeType="OUTSIDE" strokeWidth="0.0" text="Mines:" wrappingWidth="96.13671267032623">
                      <font>
                         <Font size="17.0" />

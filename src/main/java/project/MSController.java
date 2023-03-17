@@ -1,17 +1,24 @@
 package project;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.ArrayList;
 //import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -23,16 +30,16 @@ import javafx.scene.text.Text;
 
 // CONTROLLER FOR NYTT GAME
 
-public class Controller implements Initializable, CellListener {
+public class MSController implements Initializable, CellListener {
     public static final int VH = 800;
     public static final int VW = 800;
     public static final int CELL_SIZE = 40;
     public static final int X_SIZE = VW / CELL_SIZE;
     public static final int Y_SIZE = VH / CELL_SIZE;
 
-    private int time = 0;
     private Map<Cell, StackPane> cellMap = new HashMap<Cell, StackPane>();
-    private Board bd;
+    private Game game;
+    private IGameSaveHandler saver;
     // private timer
 
     // treng berre board, -> gå inn i board -> ha en "sjekker" som går igjennom alle
@@ -40,6 +47,9 @@ public class Controller implements Initializable, CellListener {
 
     @FXML
     private AnchorPane root;
+
+    @FXML
+    private TextField filename;
 
     @FXML
     private Text timer;
@@ -56,32 +66,59 @@ public class Controller implements Initializable, CellListener {
     @FXML
     private BorderPane border;
 
+    @FXML
+    private ComboBox<String> comboBox;
+
     private GridPane grid;
 
     // NEW GAME
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Lag timer
-        // Lag eigen plass
-        timer.setText("Time: " + Integer.toString(time));
+
+        grid = new GridPane();
+        comboBox.setItems(FXCollections.observableArrayList(setSlots()));
+        comboBox.setOnAction(this::handleLoad);
+
+        saver = new GameSaveHandler();
+        game = new Game(new Board(X_SIZE, CELL_SIZE), 0, "NORMAL");
+        Board bd = game.getBoard();
+        drawBoard(bd);
+
+        mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
+
+        border.setCenter(grid);
+        startTimer(game);
+    }
+
+    private void startTimer(Game game) {
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
-            time++;
-            timer.setText("Time: " + Integer.toString(time));
+            game.timeElapsed();
+            timer.setText(Integer.toString(game.getTimeElapsed()));
         }));
         timeline.setCycleCount(1000);
         timeline.play();
+    }
 
-        // Sett opp mine-teller
 
-        // Lag grafisk grid
-        grid = new GridPane();
+    private List<String> setSlots() {
+        File folder = new File("project/resources/saves");
+        List<String> slots = new ArrayList<>();
+        File[] lst = folder.listFiles();
+        int i = 0;
+        for (File file : lst) {
+            if (file.isFile()) {
+                slots.add(file.getName());
+                i++;
+            }
+        }
+        while (i < 4) {
+            slots.add("--Empty slot" + Integer.toString(i) + "--");
+            i++;
+        }
+        return slots;
+    }
 
-        // Klargjer board
-        bd = new Board(Y_SIZE, X_SIZE);
-        bd.init("NORMAL");
-
-        // Lagar grafisk mine counter
-
+    private void drawBoard(Board bd) {
         // Lag Cell-grafikk
         for (int y = 0; y < bd.getRows(); y++) {
             for (int x = 0; x < bd.getCols(); x++) {
@@ -127,24 +164,47 @@ public class Controller implements Initializable, CellListener {
                 grid.add(stack, y, x);
             }
         }
-        border.setCenter(grid);
-
-        // Sett opp mine-teller
-        // BØR HA MINECOUNTER
-        mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
     }
 
-    public void handleSave() {
-        
+    public void handleReset() {
+        Game game = new Game(new Board(X_SIZE, CELL_SIZE), 0, "NORMAL");
+        Board bd = game.getBoard();
+        drawBoard(bd);
+        mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
+        startTimer(game);
+    }
+
+    public void handleSave(ActionEvent e) {
+        try {
+            saver.save(getUserInputFilename(), game);
+            setSlots();
+
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found." + e);
+            //
+        }
     }
 
     public void handleLoad() {
+        try {
+            saver.load(getUserInputFilename());
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found." + e);
+        }
+    }
 
+    public String getUserInputFilename() {
+        String filename = this.filename.getText();
+        if (filename.isEmpty()) {
+            return "auto_save";
+        }
+        return filename;
     }
 
     @Override
     public void cellChanged(Cell cell) {
-        updateMineCount();
+        // temporary
+        updateMineCount(cell.getBoard());
         // start timer ?
         StackPane stack = (StackPane) cellMap.get(cell);
         Rectangle rect = (Rectangle) stack.getChildren().get(0);
@@ -155,7 +215,6 @@ public class Controller implements Initializable, CellListener {
             stack.setDisable(true);
             if (cell.isMine()) {
                 txt.setText("X");
-                lost();
             } else {
                 txt.setFill(Color.BLACK);
                 txt.setText(Integer.toString(cell.getAdjacentMineCount()));
@@ -174,37 +233,8 @@ public class Controller implements Initializable, CellListener {
         // GÅR IKKJE
     }
 
-    public void updateMineCount() {
+    public void updateMineCount(Board bd) {
         mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
 
-    }
-
-    public void lost() {
-        System.out.println("LOST");
-        // SHOW ALL
-    }
-
-    public void startTimer() {
-    }
-
-    public void save() {
-        System.out.println("(NOT)SAVED");
-
-        // TA BOARD OG LES FRÅ DET
-        // TRENG MAIN MENU AREA
-        // Gjer som om dette kunne implementerast likt i konsoll
-
-        // Arrays.asList(bd.getGrid())
-    }
-
-    public void reset() {
-        // Initialiser på nyy
-    }
-
-    public void updateStack(Cell cell) {
-
-    }
-
-    public void updateRect(Rectangle rect) {
     }
 }
