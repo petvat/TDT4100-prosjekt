@@ -81,12 +81,14 @@ public class GameSaveHandler implements IGameSaveHandler, Serializable {
                 cell.setFlagged(isFlagged);
             }
             sc.close();
-            for (int y = 0; y < bd.getCols(); y++) {
+            /*for (int y = 0; y < bd.getCols(); y++) {
                 for (int x = 0; x < bd.getRows(); x++) {
                     Cell cell = bd.getCellAt(y, x);
-                    bd.computeAdjacents(cell);
+                    cell.computeAdjacents();
                 }
             }
+            */
+            
             Game game = new Game(bd, timeElapsed, difficulty);
             return game;
         }
