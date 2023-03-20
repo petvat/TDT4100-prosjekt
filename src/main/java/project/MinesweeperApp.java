@@ -13,7 +13,7 @@ public class MinesweeperApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load((getClass().getResource("/project/GameScene1.fxml")));
         primaryStage.setTitle("MinesweeperFX");
-        primaryStage.setScene(new Scene(root, Controller.VW, Controller.VH));
+        primaryStage.setScene(new Scene(root, Controller.VW, Controller.VH + 30));
         primaryStage.show();
     }
 

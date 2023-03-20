@@ -31,8 +31,8 @@ public class Controller implements Initializable, CellListener {
     public static final int Y_SIZE = VH / CELL_SIZE;
 
     private int time = 0;
-    private Map<Cell, StackPane> cellMap = new HashMap<Cell, StackPane>();
-    private Board bd;
+    private Map<CellOLD, StackPane> cellMap = new HashMap<CellOLD, StackPane>();
+    private BoardOLD bd;
     // private timer
 
     // treng berre board, -> gå inn i board -> ha en "sjekker" som går igjennom alle
@@ -77,7 +77,7 @@ public class Controller implements Initializable, CellListener {
         grid = new GridPane();
 
         // Klargjer board
-        bd = new Board(Y_SIZE, X_SIZE);
+        bd = new BoardOLD(Y_SIZE, X_SIZE);
         bd.init("NORMAL");
 
         // Lagar grafisk mine counter
@@ -100,7 +100,7 @@ public class Controller implements Initializable, CellListener {
                 // Grafisk representasjon av Cell består av StackPane av rect og txt
                 StackPane stack = new StackPane(btn, txt);
 
-                Cell cell = bd.getCellAt(y, x);
+                CellOLD cell = bd.getCellAt(y, x);
                 cell.addChangeListener(this);
                 // Litt scuffed
                 cell.addChangeListener(bd);
@@ -143,7 +143,7 @@ public class Controller implements Initializable, CellListener {
     }
 
     @Override
-    public void cellChanged(Cell cell) {
+    public void cellChanged(CellOLD cell) {
         updateMineCount();
         // start timer ?
         StackPane stack = (StackPane) cellMap.get(cell);
@@ -201,7 +201,7 @@ public class Controller implements Initializable, CellListener {
         // Initialiser på nyy
     }
 
-    public void updateStack(Cell cell) {
+    public void updateStack(CellOLD cell) {
 
     }
 

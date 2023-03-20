@@ -8,10 +8,9 @@ public class Cell {
     private boolean isMine;
     private boolean isFlagged;
     private boolean isRevealed;
-    private Board board;
-    private int adjacentMineCount;
     private List<CellListener> listeners;
-    private List<Cell> adjacents;
+
+    private int adjacentMineCount;
 
     public Cell(int y, int x, boolean isMine) {
         this.y = y;
@@ -19,57 +18,16 @@ public class Cell {
         this.isMine = isMine;
         isRevealed = false;
         isFlagged = false;
-        adjacents = new ArrayList<>();
         listeners = new ArrayList<>();
-    }
 
-    public void setBoard(Board board) {
-        this.board = board;
-    }
-
-    public Board getBoard() {
-        return board;
     }
 
     public int getY() {
         return y;
     }
+
     public int getX() {
         return x;
-    }
-
-    public void computeAdjacents() {
-        // Ein grid av hosliggande celler, der (0, 0) er cella som vert trykka på
-        int[] adjacentPoints = new int[] {
-                -1, -1,
-                -1, 0,
-                -1, 1,
-                0, -1,
-                0, 1,
-                1, -1,
-                1, 0,
-                1, 1
-        };
-        for (int i = 0; i < adjacentPoints.length - 1; i += 2) {
-            int dy = adjacentPoints[i];
-            int dx = adjacentPoints[i + 1];
-
-            int adjacentY = this.y + dy;
-            int adjacentX = this.x + dx;
-
-            // Sjekk om Cell gitt ved adjacentY/X finst, viss ja, legg til i liste av
-            // hosliggande celler
-            if (board.isValidCoordinate(adjacentY, adjacentX)) {
-                Cell cell = board.getCellAt(adjacentY, adjacentX);
-                if (cell.isMine())
-                    adjacentMineCount++;
-                if (!cell.isRevealed()) {
-                    this.adjacents.add(board.getCellAt(adjacentY, adjacentX));
-                }
-            } else {
-                continue;
-            }
-        }
     }
 
     public boolean isFlagged() {
@@ -82,50 +40,29 @@ public class Cell {
 
     public void setFlagged(boolean isFlagged) {
         this.isFlagged = isFlagged;
+        // update();
     }
 
     public void setRevealed(boolean isRevealed) {
         this.isRevealed = isRevealed;
+        // update(); GRUNNLAG: caller controller.cellChanged() som fører til at CellMap
+        // ikkje finn this cell viss Controller.drawBoard() ikkje er calla først
     }
 
     public boolean isMine() {
         return isMine;
     }
 
-    public int getAdjacentMineCount() {
-        return adjacentMineCount;
-    }
-
-    public void reveal() {
-        if (isFlagged)
-            return;
-        computeAdjacents();
-        isRevealed = true;
-        update();
-        if (isMine) {
-            update();
-            return;
-        }
-        // Viss alle hosliggande celler ikkje er miner, opne dei ved rekursiv reveal()
-        if (this.adjacentMineCount == 0) {
-            for (Cell adjacent : this.adjacents) {
-                if (!adjacent.isRevealed)
-                    adjacent.reveal();
-            }
-        }
-    }
-
     public void setIsMine(boolean isMine) {
         this.isMine = isMine;
     }
 
-    public void flag() {
-        if (!isFlagged) {
-            isFlagged = true;
-        } else if (isFlagged) {
-            isFlagged = false;
-        }
-        update();
+    public void setAdjacentMineCount(int adjacentMineCount) {
+        this.adjacentMineCount = adjacentMineCount;
+    }
+
+    public int getAdjacentMineCount() {
+        return adjacentMineCount;
     }
 
     public void update() {

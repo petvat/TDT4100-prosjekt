@@ -1,14 +1,13 @@
 package project;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Board implements CellListener {
-
+public class Board {
     private Cell[][] grid;
-    private double mineDensity = 0.2;
+    private double mineDensity;
     private int minesTotal;
     private int minesLeft;
-    private MineCounter counter;
 
     public Board(int ySize, int xSize) {
         grid = new Cell[ySize][xSize];
@@ -23,13 +22,14 @@ public class Board implements CellListener {
                 mineDensity = 0.12625;
             case "HARD":
                 mineDensity = 0.2;
+            default:
+                mineDensity = 0.2;
         }
         // Sett opp grid og legg til mine
         for (int y = 0; y < getRows(); y++) {
             for (int x = 0; x < getCols(); x++) {
                 Cell cell = new Cell(y, x, Math.random() <= mineDensity);
                 grid[y][x] = cell;
-                cell.setBoard(this);
                 // Samle miner til minesTotal
                 if (cell.isMine()) {
                     minesTotal++;
@@ -59,8 +59,6 @@ public class Board implements CellListener {
         return (y >= 0 && y < grid.length && x >= 0 && x < grid[y].length);
     }
 
-    // SAVE ALL ELEMENTS
-
     public Cell[][] getGrid() {
         return grid;
     }
@@ -81,19 +79,83 @@ public class Board implements CellListener {
         return grid[0].length;
     }
 
-    // MINECOUNTING
-    public MineCounter getCounter() {
-        return counter;
-    }
-
-    @Override
-    public void cellChanged(Cell cell) {
-        // Oppdater minesLeft dersom Cell er blitt flagga
-        if (cell.isFlagged() && minesLeft > 0) {
-            minesLeft--;
-        } else if (!cell.isFlagged() && !cell.isRevealed() && minesLeft < minesTotal) {
-            minesLeft++;
+    public void reveal(Cell cell) {
+        if (cell.isFlagged())
+            return;
+        cell.setRevealed(true);
+        if (cell.isMine()) {
+            cell.update();
+            return;
+        }
+        // nonMinesLeft--
+        List<Cell> adjacents = computeAdjacents(cell);
+        int adjacentMineCount = computeAdjacentMineCount(adjacents);
+        cell.setAdjacentMineCount(adjacentMineCount);
+        cell.update();
+        // Viss ingen miner
+        if (adjacentMineCount == 0) {
+            for (Cell adjacent : adjacents) {
+                if (!adjacent.isRevealed()) {
+                    reveal(adjacent);
+                }
+            }
         }
     }
 
+    public void flag(Cell cell) {
+        if (!cell.isFlagged()) {
+            cell.setFlagged(true);
+            minesLeft--;
+            cell.update();
+        } else if (cell.isFlagged()) {
+            cell.setFlagged(false);
+            minesLeft++;
+            cell.update();
+            // Korleis kan Controller bli informert av ny minecount?
+        }
+    }
+
+    public List<Cell> computeAdjacents(Cell cell) {
+        // Ein grid av hosliggande celler, der (0, 0) er cella som vert trykka på
+        int[] adjacentPoints = new int[] {
+                -1, -1,
+                -1, 0,
+                -1, 1,
+                0, -1,
+                0, 1,
+                1, -1,
+                1, 0,
+                1, 1
+        };
+        List<Cell> adjacents = new ArrayList<>();
+        for (int i = 0; i < adjacentPoints.length - 1; i += 2) {
+            int dy = adjacentPoints[i];
+            int dx = adjacentPoints[i + 1];
+
+            int adjacentY = cell.getY() + dy;
+            int adjacentX = cell.getX() + dx;
+
+            // Sjekk om Cell gitt ved adjacentY/X finst, viss ja, legg til i liste av
+            // hosliggande celler
+            if (isValidCoordinate(adjacentY, adjacentX)) {
+                Cell adjCell = getCellAt(adjacentY, adjacentX);
+                adjacents.add(adjCell);
+                if (!adjCell.isRevealed()) {
+                    // unødvendig, fordi sjekker over
+                }
+            } else {
+                continue;
+            }
+        }
+        return adjacents;
+    }
+
+    public static int computeAdjacentMineCount(List<Cell> adjacents) {
+        int adjacentMineCount = 0;
+        for (Cell adjacent : adjacents) {
+            if (adjacent.isMine())
+                adjacentMineCount++;
+        }
+        return adjacentMineCount;
+    }
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 //import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -24,25 +25,30 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 // CONTROLLER FOR NYTT GAME
 
 public class MSController implements Initializable, CellListener {
+    // Skal i teorien kunne endre alle desse
     public static final int VH = 800;
     public static final int VW = 800;
     public static final int CELL_SIZE = 40;
     public static final int X_SIZE = VW / CELL_SIZE;
     public static final int Y_SIZE = VH / CELL_SIZE;
+    private Image cellImg = new Image(getClass().getResourceAsStream("/project/img/mineTile25px.png"));
+    private Image FlaggedImg = new Image(getClass().getResourceAsStream("/project/img/Flagged.png"));
 
-    private Map<Cell, StackPane> cellMap = new HashMap<Cell, StackPane>();
+    private Map<Cell, StackPane> cellMap;
     private Game game;
     private IGameSaveHandler saver;
     private String gameFile;
@@ -87,8 +93,9 @@ public class MSController implements Initializable, CellListener {
 
         // ?????????
         saver = new GameSaveHandler();
-        game = new Game(new Board(X_SIZE, CELL_SIZE), 0, "NORMAL");
+        game = new Game(new Board(X_SIZE, Y_SIZE), 0, "NORMAL");
         Board bd = game.getBoard();
+        // litt snodig
         bd.init(game.getDifficulty());
         drawBoard(bd);
 
@@ -166,18 +173,20 @@ public class MSController implements Initializable, CellListener {
     }
 
     private void drawBoard(Board bd) {
+        cellMap = new HashMap<Cell, StackPane>();
         // Lag Cell-grafikk
         for (int y = 0; y < bd.getRows(); y++) {
             for (int x = 0; x < bd.getCols(); x++) {
 
                 // DEL INN I NY CLASS?
                 // Må sette -2 fordi stroke tar 1px
-                Rectangle btn = new Rectangle(CELL_SIZE - 2, CELL_SIZE - 2);
+                Rectangle btn = new Rectangle(CELL_SIZE, CELL_SIZE);
                 Text txt = new Text();
 
                 // Default utsjånad
-                btn.setFill(Color.GRAY);
-                btn.setStroke(Color.LIGHTGRAY);
+                // btn.setFill(Color.GRAY);
+                // btn.setStroke(Color.LIGHTGRAY);
+                btn.setFill(new ImagePattern(cellImg));
                 txt.setFill(Color.DARKGRAY);
                 txt.setText("");
 
@@ -187,7 +196,7 @@ public class MSController implements Initializable, CellListener {
                 Cell cell = bd.getCellAt(y, x);
                 cell.addChangeListener(this);
                 // Litt scuffed
-                cell.addChangeListener(bd);
+                // cell.addChangeListener(bd);
 
                 // Lag map for å finne igjen stack frå cell
                 cellMap.put(cell, stack);
@@ -195,15 +204,21 @@ public class MSController implements Initializable, CellListener {
                 // Bind Cell til brukar-interaksjon
                 stack.setOnMouseClicked(e -> {
                     if (e.getButton() == MouseButton.PRIMARY) {
-                        cell.reveal();
-                        // bd.reveal(cell);
+                        // cell.reveal();
+                        bd.reveal(cell);
+                        if (game.isWon()) {
+                            won();
+                        }
                     } else if (e.getButton() == MouseButton.SECONDARY) {
-                        cell.flag();
+                        // cell.flag();
+                        bd.flag(cell);
+                        updateMineCount(bd);
+
                     }
                 });
                 stack.setOnMouseEntered(e -> {
-                    btn.setTranslateX(-0.5);
-                    btn.setTranslateY(-0.5);
+                    btn.setTranslateX(0.5);
+                    btn.setTranslateY(0.5);
                 });
                 stack.setOnMouseExited(e -> {
                     btn.setTranslateX(0);
@@ -217,6 +232,7 @@ public class MSController implements Initializable, CellListener {
     public void handleReset() {
         Game game = new Game(new Board(X_SIZE, CELL_SIZE), 0, "NORMAL");
         Board bd = game.getBoard();
+        bd.init(game.getDifficulty());
         drawBoard(bd);
         mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
         startTimer(game);
@@ -255,6 +271,10 @@ public class MSController implements Initializable, CellListener {
 
     @FXML
     public void handleLoad() {
+
+        // ENTEN LOAD(FILE, GAME) FOR Å SLEPPE Å LAGE NYTT GAME
+        // PROS: ENKELT Å FIKSE, CONS: GAME BOARD-STORLEIK MÅ VERE FIXED
+        // ELLER DRAWBOARD() HER
         String file = loadBox.getSelectionModel().getSelectedItem().toString();
         try {
             // handle if game object is null
@@ -264,6 +284,9 @@ public class MSController implements Initializable, CellListener {
             game = saver.load(file);
             gameFile = file;
             Board bd = game.getBoard();
+            drawBoard(bd);
+            // GRUNNLAG -> cellChanged gir sannsynlegvis "Cell finst ikkje i cellMap" fordi
+            // ny celle
 
             // HANDLE REINITIALISATION OF CELLS EASY WAY
             // ser no at scuffed med controller implements listener, fordi dette må vere her
@@ -277,10 +300,14 @@ public class MSController implements Initializable, CellListener {
         }
     }
 
+    public void won() {
+        System.out.println("WON!! YE");
+    }
+
     @Override
     public void cellChanged(Cell cell) {
         // temporary
-        updateMineCount(cell.getBoard());
+        // updateMineCount(cell.getBoard());
         // start timer ?
         StackPane stack = (StackPane) cellMap.get(cell);
         Rectangle rect = (Rectangle) stack.getChildren().get(0);
@@ -293,15 +320,18 @@ public class MSController implements Initializable, CellListener {
                 txt.setText("X");
             } else {
                 txt.setFill(Color.BLACK);
-                txt.setText(Integer.toString(cell.getAdjacentMineCount()));
+                // txt.setText(Integer.toString(cell.getAdjacentMineCount()));
+                txt.setText(cell.getAdjacentMineCount() == 0 ? " " : Integer.toString(cell.getAdjacentMineCount()));
             }
         } else if (cell.isFlagged()) {
-            txt.setText("F");
-            txt.setFill(Color.WHITE);
-            rect.setFill(Color.RED);
+            // txt.setText("F");
+            // txt.setFill(Color.WHITE);
+            // rect.setFill(Color.RED);
+            rect.setFill(new ImagePattern(FlaggedImg));
         } else if (!cell.isFlagged()) {
             // default
-            rect.setFill(Color.GRAY);
+            rect.setFill(new ImagePattern(cellImg));
+            // rect.setFill(Color.GRAY);
             txt.setText("");
         }
 

@@ -75,20 +75,22 @@ public class GameSaveHandler implements IGameSaveHandler, Serializable {
                 boolean isRevealed = Boolean.parseBoolean(bools[2]);
 
                 Cell cell = new Cell(y, x, isMine);
-                //cell.setBoard(bd);
+                // cell.setBoard(bd);
                 bd.getGrid()[y][x] = cell;
                 cell.setRevealed(isRevealed);
                 cell.setFlagged(isFlagged);
+                cell.setIsMine(isMine);
             }
             sc.close();
-            /*for (int y = 0; y < bd.getCols(); y++) {
-                for (int x = 0; x < bd.getRows(); x++) {
-                    Cell cell = bd.getCellAt(y, x);
-                    cell.computeAdjacents();
-                }
-            }
-            */
-            
+            /*
+             * for (int y = 0; y < bd.getCols(); y++) {
+             * for (int x = 0; x < bd.getRows(); x++) {
+             * Cell cell = bd.getCellAt(y, x);
+             * cell.computeAdjacents();
+             * }
+             * }
+             */
+            // problem overføre CellMap
             Game game = new Game(bd, timeElapsed, difficulty);
             return game;
         }
