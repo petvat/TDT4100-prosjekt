@@ -8,10 +8,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
@@ -19,6 +23,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -40,6 +45,7 @@ public class MSController implements Initializable, CellListener {
     private Map<Cell, StackPane> cellMap = new HashMap<Cell, StackPane>();
     private Game game;
     private IGameSaveHandler saver;
+    private String gameFile;
     // private timer
 
     // treng berre board, -> gå inn i board -> ha en "sjekker" som går igjennom alle
@@ -58,7 +64,7 @@ public class MSController implements Initializable, CellListener {
     private Text mineCount;
 
     @FXML
-    private Button save;
+    private Button saveBtn;
 
     @FXML
     private Button reset;
@@ -67,27 +73,65 @@ public class MSController implements Initializable, CellListener {
     private BorderPane border;
 
     @FXML
-    private ComboBox<String> comboBox;
+    private ComboBox loadBox;
 
     private GridPane grid;
+
+    @FXML
 
     // NEW GAME
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
         grid = new GridPane();
-        comboBox.setItems(FXCollections.observableArrayList(setSlots()));
-        comboBox.setOnAction(this::handleLoad);
 
+        // ?????????
         saver = new GameSaveHandler();
         game = new Game(new Board(X_SIZE, CELL_SIZE), 0, "NORMAL");
         Board bd = game.getBoard();
+        bd.init(game.getDifficulty());
         drawBoard(bd);
 
         mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
 
         border.setCenter(grid);
         startTimer(game);
+
+        // PRØVE
+        gameFile = null;
+
+        // saveBox.setItems(FXCollections.observableArrayList(setSlots()));
+        // saveBox.setOnAction(this::handleSave);
+        ObservableList<String> list = FXCollections.observableArrayList(setSlots());
+        loadBox.setItems(list);
+        // loadBox.setOnAction(this::handleLoad);
+        // initSaveBox();
+    }
+
+    /*
+     * private void initSaveBox() {
+     * // FORSØK PÅ Å LEGGE TIL SLOT-VELGER + PROMPT FOR Å LEGGE TIL NY FIL
+     * saveBox.getSelectionModel().selectedItemProperty().addListener((observable,
+     * oldValue, newValue) -> {
+     * int index = saveBox.getSelectionModel().getSelectedIndex();
+     * saveBox.getItems().remove(index);
+     * 
+     * TextInputDialog dialog = new TextInputDialog();
+     * dialog.setTitle("overwrite slot");
+     * dialog.setHeaderText("Enter name of new file:");
+     * Optional<String> result = dialog.showAndWait();
+     * 
+     * if (result.isPresent()) {
+     * String newItem = result.get();
+     * saveBox.getItems().add(index, newItem);
+     * handleSave(newItem);
+     * }
+     * });
+     * }
+     */
+
+    private void initLoadBox() {
+        // BRUKE I SAVEBOX ?? VISS IKKJE BERRE ADD
     }
 
     private void startTimer(Game game) {
@@ -99,18 +143,21 @@ public class MSController implements Initializable, CellListener {
         timeline.play();
     }
 
-
     private List<String> setSlots() {
         File folder = new File("project/resources/saves");
-        List<String> slots = new ArrayList<>();
-        File[] lst = folder.listFiles();
         int i = 0;
-        for (File file : lst) {
-            if (file.isFile()) {
-                slots.add(file.getName());
-                i++;
+        List<String> slots = new ArrayList<>();
+        if (folder.listFiles() != null) {
+            File[] lst = folder.listFiles();
+            for (File file : lst) {
+                if (file.isFile()) {
+                    String[] parts = file.getName().split(".");
+                    slots.add(parts[0]);
+                    i++;
+                }
             }
         }
+
         while (i < 4) {
             slots.add("--Empty slot" + Integer.toString(i) + "--");
             i++;
@@ -149,6 +196,7 @@ public class MSController implements Initializable, CellListener {
                 stack.setOnMouseClicked(e -> {
                     if (e.getButton() == MouseButton.PRIMARY) {
                         cell.reveal();
+                        // bd.reveal(cell);
                     } else if (e.getButton() == MouseButton.SECONDARY) {
                         cell.flag();
                     }
@@ -174,31 +222,59 @@ public class MSController implements Initializable, CellListener {
         startTimer(game);
     }
 
-    public void handleSave(ActionEvent e) {
+    // SAVE AS METODE? + OVERWRITE?
+    @FXML
+    public void handleSave() {
+        // getUserInputFilename()
+        if (gameFile == null) {
+            TextInputDialog tid = new TextInputDialog();
+            tid.setTitle("Save game");
+            tid.setHeaderText("Enter name of new game file:");
+            Optional<String> result = tid.showAndWait();
+
+            if (result.isPresent()) {
+                gameFile = result.get();
+            } else {
+                gameFile = "unnamed save";
+            }
+        }
+
         try {
-            saver.save(getUserInputFilename(), game);
-            setSlots();
+            saver.save(gameFile, game);
+            // setSlots();
 
         } catch (FileNotFoundException e) {
             System.out.println("File not found." + e);
             //
         }
+
+        ObservableList<String> list = FXCollections.observableArrayList(setSlots());
+        loadBox.setItems(list);
+
     }
 
+    @FXML
     public void handleLoad() {
+        String file = loadBox.getSelectionModel().getSelectedItem().toString();
         try {
-            saver.load(getUserInputFilename());
+            // handle if game object is null
+            if (saver.load(file) != null) {
+                game = saver.load(file);
+            }
+            game = saver.load(file);
+            gameFile = file;
+            Board bd = game.getBoard();
+
+            // HANDLE REINITIALISATION OF CELLS EASY WAY
+            // ser no at scuffed med controller implements listener, fordi dette må vere her
+            for (int y = 0; y < bd.getCols(); y++) {
+                for (int x = 0; x < bd.getRows(); x++) {
+                    bd.getCellAt(y, x).update();
+                }
+            }
         } catch (FileNotFoundException e) {
             System.out.println("File not found." + e);
         }
-    }
-
-    public String getUserInputFilename() {
-        String filename = this.filename.getText();
-        if (filename.isEmpty()) {
-            return "auto_save";
-        }
-        return filename;
     }
 
     @Override

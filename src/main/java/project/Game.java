@@ -16,7 +16,6 @@ public class Game {
         this.board = board;
         this.timeElapsed = timeElapsed;
         this.difficulty = difficulty;
-        board.init(difficulty);
     }
 
     public void timeElapsed() {
@@ -29,6 +28,10 @@ public class Game {
 
     public Board getBoard() {
         return board;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
     }
 
     public boolean isWon() {

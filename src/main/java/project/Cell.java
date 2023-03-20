@@ -31,6 +31,13 @@ public class Cell {
         return board;
     }
 
+    public int getY() {
+        return y;
+    }
+    public int getX() {
+        return x;
+    }
+
     public void computeAdjacents() {
         // Ein grid av hosliggande celler, der (0, 0) er cella som vert trykka på
         int[] adjacentPoints = new int[] {
@@ -106,6 +113,10 @@ public class Cell {
                     adjacent.reveal();
             }
         }
+    }
+
+    public void setIsMine(boolean isMine) {
+        this.isMine = isMine;
     }
 
     public void flag() {

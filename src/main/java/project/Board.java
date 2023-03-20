@@ -39,8 +39,20 @@ public class Board implements CellListener {
         }
     }
 
+    public void setMinesTotal(int minesTotal) {
+        this.minesTotal = minesTotal;
+    }
+
+    public void setMinesLeft(int minesLeft) {
+        this.minesLeft = minesLeft;
+    }
+
     public int getMinesLeft() {
         return minesLeft;
+    }
+
+    public int getMinesTotal() {
+        return minesTotal;
     }
 
     public boolean isValidCoordinate(int y, int x) {
@@ -55,6 +67,10 @@ public class Board implements CellListener {
 
     public Cell getCellAt(int y, int x) {
         return grid[y][x];
+    }
+
+    public void setCellAt(Cell cell, int y, int x) {
+        grid[y][x] = cell;
     }
 
     public int getRows() {
@@ -75,8 +91,7 @@ public class Board implements CellListener {
         // Oppdater minesLeft dersom Cell er blitt flagga
         if (cell.isFlagged() && minesLeft > 0) {
             minesLeft--;
-        }
-        else if (!cell.isFlagged() && !cell.isRevealed() && minesLeft < minesTotal) {
+        } else if (!cell.isFlagged() && !cell.isRevealed() && minesLeft < minesTotal) {
             minesLeft++;
         }
     }
