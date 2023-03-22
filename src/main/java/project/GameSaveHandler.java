@@ -19,8 +19,8 @@ public class GameSaveHandler {
     public static final String EXTENSION = ".msfx";
     public static final String PATH = "src/main/resources/project/saves/";
 
-    public void save(String filename, Game game) throws FileNotFoundException {
-        File file = new File(getPath(filename));
+    public void save(Game game) throws FileNotFoundException {
+        File file = new File(getPath(game.getName()));
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -32,13 +32,13 @@ public class GameSaveHandler {
             Board bd = game.getBoard();
             String gameInfo = String.format("%d,%d,%d,%d,%d, %s", bd.getCols(), bd.getRows(), game.getTimeElapsed(),
                     bd.getMinesLeft(), bd.getMinesTotal(), game.getDifficulty());
-            wr.println(gameInfo);
+            wr.print(gameInfo);
             for (int y = 0; y < bd.getCols(); y++) {
                 for (int x = 0; x < bd.getRows(); x++) {
                     wr.print("\n");
                     Cell cell = bd.getCellAt(y, x);
-                    String cellBools = String.format("%d,%d,%d", cell.isMine() ? 1 : 0, cell.isFlagged() ? 1 : 0,
-                            cell.isRevealed() ? 1 : 0);
+                    String cellBools = String.format("%d,%d,%d,%d", cell.isMine() ? 1 : 0, cell.isFlagged() ? 1 : 0,
+                            cell.isRevealed() ? 1 : 0, cell.getAdjacentMineCount());
                     String cellCoords = String.format("%d,%d", y, x);
 
                     wr.print(cellCoords + ":" + cellBools);
@@ -50,17 +50,6 @@ public class GameSaveHandler {
         }
     }
 
-    /*
-     * public void save(String filename, Game game) throws IOException{
-     * try {
-     * OutputStream out = new FileOutputStream(getPath(filename).toFile());
-     * save(out, game);
-     * }
-     * catch (IOException ioe) {
-     * System.out.println("trlbbel");
-     * }
-     * }
-     */
 
     public Game load(String filename) throws FileNotFoundException {
         File file = new File(PATH + filename + EXTENSION);
@@ -86,12 +75,14 @@ public class GameSaveHandler {
                 boolean isMine = Integer.parseInt(bools[0]) == 1 ? true : false;
                 boolean isFlagged = Integer.parseInt(bools[1]) == 1 ? true : false;
                 boolean isRevealed = Integer.parseInt(bools[2]) == 1 ? true : false;
+                int adjacentMineCount = Integer.parseInt(bools[3]);
 
                 Cell cell = new Cell(y, x, isMine);
                 // cell.setBoard(bd);
                 cell.setRevealed(isRevealed);
                 cell.setFlagged(isFlagged);
                 cell.setIsMine(isMine);
+                cell.setAdjacentMineCount(adjacentMineCount);
                 bd.getGrid()[y][x] = cell;
             }
             sc.close();
