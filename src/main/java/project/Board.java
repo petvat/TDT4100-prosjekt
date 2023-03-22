@@ -100,6 +100,8 @@ public class Board {
         }
     }
 
+    // Kanskje reveal/flag tilbake i Cell, meir logisk ...
+
     public void flag(Cell cell) {
         if (!cell.isFlagged()) {
             cell.setFlagged(true);

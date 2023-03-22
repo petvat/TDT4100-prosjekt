@@ -55,7 +55,7 @@ public class MSController implements Initializable, CellListener {
 
     private Map<Cell, StackPane> cellMap;
     private Game game;
-    private IGameSaveHandler saver;
+    private GameSaveHandler saver;
     private String gameFile;
     private Timeline timeline;
     // private timer
@@ -121,32 +121,6 @@ public class MSController implements Initializable, CellListener {
         // initSaveBox();
     }
 
-    /*
-     * private void initSaveBox() {
-     * // FORSØK PÅ Å LEGGE TIL SLOT-VELGER + PROMPT FOR Å LEGGE TIL NY FIL
-     * saveBox.getSelectionModel().selectedItemProperty().addListener((observable,
-     * oldValue, newValue) -> {
-     * int index = saveBox.getSelectionModel().getSelectedIndex();
-     * saveBox.getItems().remove(index);
-     * 
-     * TextInputDialog dialog = new TextInputDialog();
-     * dialog.setTitle("overwrite slot");
-     * dialog.setHeaderText("Enter name of new file:");
-     * Optional<String> result = dialog.showAndWait();
-     * 
-     * if (result.isPresent()) {
-     * String newItem = result.get();
-     * saveBox.getItems().add(index, newItem);
-     * handleSave(newItem);
-     * }
-     * });
-     * }
-     */
-
-    private void initLoadBox() {
-        // BRUKE I SAVEBOX ?? VISS IKKJE BERRE ADD
-    }
-
     private void startTimer(Game game) {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             game.timeElapsed();
@@ -157,24 +131,30 @@ public class MSController implements Initializable, CellListener {
     }
 
     private List<String> setSlots() {
-        File folder = new File("project/resources/saves");
-        int i = 0;
+        File folder = new File("src/main/resources/project/saves/");
         List<String> slots = new ArrayList<>();
+        System.out.println(folder.listFiles());
         if (folder.listFiles() != null) {
             File[] lst = folder.listFiles();
             for (File file : lst) {
                 if (file.isFile()) {
-                    String[] parts = file.getName().split(".");
-                    slots.add(parts[0]);
-                    i++;
+                    String filename = file.getName();
+                    String name = filename.substring(0,filename.length() - 5);
+                    System.out.println(name);
+                    slots.add(name);
                 }
             }
         }
-
-        while (i < 4) {
-            slots.add("--Empty slot" + Integer.toString(i) + "--");
-            i++;
+        if (slots.isEmpty()) {
+            slots.add("Wow, such empty ...");
         }
+
+        /*
+         * while (i < 4) {
+         * slots.add("--Empty slot" + Integer.toString(i) + "--");
+         * i++;
+         * }
+         */
         return slots;
     }
 
@@ -252,7 +232,7 @@ public class MSController implements Initializable, CellListener {
         mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
         // DRITA
         timeline.stop();
-        timer.setText("Time: 0");
+        timer.setText("Time:  ");
         mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
         startTimer(game);
     }
@@ -261,21 +241,22 @@ public class MSController implements Initializable, CellListener {
     @FXML
     public void handleSave() {
         // getUserInputFilename()
-        if (gameFile == null) {
+        if (game.getName() == null) {
             TextInputDialog tid = new TextInputDialog();
             tid.setTitle("Save game");
             tid.setHeaderText("Enter name of new game file:");
             Optional<String> result = tid.showAndWait();
 
             if (result.isPresent()) {
-                gameFile = result.get();
+                game.setName(result.get());
             } else {
-                gameFile = "unnamed save";
+                game.setName("unnamed_save");;
             }
         }
 
         try {
-            saver.save(gameFile, game);
+            saver.save(game);
+            // GameSaveHandler.save(gameFile, game)
             // setSlots();
 
         } catch (FileNotFoundException e) {
@@ -297,13 +278,20 @@ public class MSController implements Initializable, CellListener {
         String file = loadBox.getSelectionModel().getSelectedItem().toString();
         try {
             // handle if game object is null
-            if (saver.load(file) != null) {
-                game = saver.load(file);
+            if (saver.load(file) == null) {
+                return;
+                // game = GameSaveHandler.load(file)
             }
             game = saver.load(file);
             gameFile = file;
             Board bd = game.getBoard();
             drawBoard(bd);
+            System.out.println(Integer.toString(bd.getMinesLeft()));
+            mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
+            // DRITA
+            timeline.stop();
+            mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
+            startTimer(game);
             // GRUNNLAG -> cellChanged gir sannsynlegvis "Cell finst ikkje i cellMap" fordi
             // ny celle
 

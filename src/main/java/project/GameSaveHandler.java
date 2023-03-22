@@ -7,50 +7,64 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.Writer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
-public class GameSaveHandler implements IGameSaveHandler, Serializable {
-    public static final String EXTENSION = "msfx";
+public class GameSaveHandler {
+    public static final String EXTENSION = ".msfx";
+    public static final String PATH = "src/main/resources/project/saves/";
 
-    @Override
-    public void save(String file, Game game) throws FileNotFoundException {
-        // Forskjellige grids?
-
-        try (PrintWriter wr = new PrintWriter(new File(getPath(file)))) {
+    public void save(String filename, Game game) throws FileNotFoundException {
+        File file = new File(getPath(filename));
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException ioe) {
+                System.out.println("File could not get created");
+            }
+        }
+        try (PrintWriter wr = new PrintWriter(file)) {
             Board bd = game.getBoard();
             String gameInfo = String.format("%d,%d,%d,%d,%d, %s", bd.getCols(), bd.getRows(), game.getTimeElapsed(),
                     bd.getMinesLeft(), bd.getMinesTotal(), game.getDifficulty());
             wr.println(gameInfo);
             for (int y = 0; y < bd.getCols(); y++) {
                 for (int x = 0; x < bd.getRows(); x++) {
+                    wr.print("\n");
                     Cell cell = bd.getCellAt(y, x);
-                    String cellBools = String.format("%b,%b,%b", cell.isMine(), cell.isFlagged(), cell.isRevealed());
+                    String cellBools = String.format("%d,%d,%d", cell.isMine() ? 1 : 0, cell.isFlagged() ? 1 : 0,
+                            cell.isRevealed() ? 1 : 0);
                     String cellCoords = String.format("%d,%d", y, x);
 
-                    wr.print(cellCoords + ":" + cellBools + "\n");
+                    wr.print(cellCoords + ":" + cellBools);
                 }
             }
             wr.close();
-        }
-        // ENKEL ? metode
-        try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(new File(getPath(file))));
-            out.writeObject(game);
-            out.close();
-        }
-
-        catch (Exception e) {
-            System.out.println("File not found.");
+        } catch (Exception e) {
+            System.out.println("could not save file. " + e);
         }
     }
 
-    @Override
-    public Game load(String file) throws FileNotFoundException {
+    /*
+     * public void save(String filename, Game game) throws IOException{
+     * try {
+     * OutputStream out = new FileOutputStream(getPath(filename).toFile());
+     * save(out, game);
+     * }
+     * catch (IOException ioe) {
+     * System.out.println("trlbbel");
+     * }
+     * }
+     */
 
-        try (Scanner sc = new Scanner(new File(getPath(file)))) {
+    public Game load(String filename) throws FileNotFoundException {
+        File file = new File(PATH + filename + EXTENSION);
+        try (Scanner sc = new Scanner(file)) {
             String[] ps = sc.nextLine().split(",");
             int cols = Integer.parseInt(ps[0]);
             int rows = Integer.parseInt(ps[1]);
@@ -63,34 +77,24 @@ public class GameSaveHandler implements IGameSaveHandler, Serializable {
             // retarda løysing
             bd.setMinesTotal(minesTotal);
             bd.setMinesLeft(minesLeft);
-
             while (sc.hasNextLine()) {
                 String[] parts = sc.nextLine().split(":");
                 String[] coords = parts[0].split(",");
                 String[] bools = parts[1].split(",");
                 int y = Integer.parseInt(coords[0]);
                 int x = Integer.parseInt(coords[1]);
-                boolean isMine = Boolean.parseBoolean(bools[0]);
-                boolean isFlagged = Boolean.parseBoolean(bools[1]);
-                boolean isRevealed = Boolean.parseBoolean(bools[2]);
+                boolean isMine = Integer.parseInt(bools[0]) == 1 ? true : false;
+                boolean isFlagged = Integer.parseInt(bools[1]) == 1 ? true : false;
+                boolean isRevealed = Integer.parseInt(bools[2]) == 1 ? true : false;
 
                 Cell cell = new Cell(y, x, isMine);
                 // cell.setBoard(bd);
-                bd.getGrid()[y][x] = cell;
                 cell.setRevealed(isRevealed);
                 cell.setFlagged(isFlagged);
                 cell.setIsMine(isMine);
+                bd.getGrid()[y][x] = cell;
             }
             sc.close();
-            /*
-             * for (int y = 0; y < bd.getCols(); y++) {
-             * for (int x = 0; x < bd.getRows(); x++) {
-             * Cell cell = bd.getCellAt(y, x);
-             * cell.computeAdjacents();
-             * }
-             * }
-             */
-            // problem overføre CellMap
             Game game = new Game(bd, timeElapsed, difficulty);
             return game;
         }
@@ -98,8 +102,8 @@ public class GameSaveHandler implements IGameSaveHandler, Serializable {
 
     // IF # REVEALED TRUE && !cell.isRevealed() -> CELL.REVEAL()
     // IF NOT EXIST CREATE QUESTION
-    private static String getPath(String file) {
-        return GameSaveHandler.class.getResource("saves/").getFile() + file + "." + EXTENSION;
+    private static String getPath(String filename) {
+        return (PATH + filename + EXTENSION);
     }
 
 }

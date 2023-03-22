@@ -11,6 +11,7 @@ public class Game implements CellListener {
     private Board board;
     private String difficulty;
     private boolean isWon;
+    private String name;
 
     public Game(Board board, int timeElapsed, String difficulty) {
         this.board = board;
@@ -49,6 +50,14 @@ public class Game implements CellListener {
             }
         }
         return (revealedCells + mines == cellsTotal);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void play(Cell cell) {
