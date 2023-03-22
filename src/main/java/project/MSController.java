@@ -34,6 +34,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 // CONTROLLER FOR NYTT GAME
@@ -45,13 +46,18 @@ public class MSController implements Initializable, CellListener {
     public static final int CELL_SIZE = 40;
     public static final int X_SIZE = VW / CELL_SIZE;
     public static final int Y_SIZE = VH / CELL_SIZE;
+    private Image mineImg = new Image(getClass().getResourceAsStream("/project/img/MineIcon50px.png"));
     private Image cellImg = new Image(getClass().getResourceAsStream("/project/img/mineTile25px.png"));
     private Image FlaggedImg = new Image(getClass().getResourceAsStream("/project/img/Flagged.png"));
+    private Font pixelFont = Font.loadFont(
+            MSController.class.getResource("/project/font/upheavtt.ttf").toExternalForm(),
+            26);
 
     private Map<Cell, StackPane> cellMap;
     private Game game;
     private IGameSaveHandler saver;
     private String gameFile;
+    private Timeline timeline;
     // private timer
 
     // treng berre board, -> gå inn i board -> ha en "sjekker" som går igjennom alle
@@ -142,9 +148,9 @@ public class MSController implements Initializable, CellListener {
     }
 
     private void startTimer(Game game) {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+        timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             game.timeElapsed();
-            timer.setText(Integer.toString(game.getTimeElapsed()));
+            timer.setText("Time: " + Integer.toString(game.getTimeElapsed()));
         }));
         timeline.setCycleCount(1000);
         timeline.play();
@@ -173,6 +179,7 @@ public class MSController implements Initializable, CellListener {
     }
 
     private void drawBoard(Board bd) {
+        grid.getChildren().clear();
         cellMap = new HashMap<Cell, StackPane>();
         // Lag Cell-grafikk
         for (int y = 0; y < bd.getRows(); y++) {
@@ -187,7 +194,7 @@ public class MSController implements Initializable, CellListener {
                 // btn.setFill(Color.GRAY);
                 // btn.setStroke(Color.LIGHTGRAY);
                 btn.setFill(new ImagePattern(cellImg));
-                txt.setFill(Color.DARKGRAY);
+                txt.setFont(pixelFont);
                 txt.setText("");
 
                 // Grafisk representasjon av Cell består av StackPane av rect og txt
@@ -204,13 +211,19 @@ public class MSController implements Initializable, CellListener {
                 // Bind Cell til brukar-interaksjon
                 stack.setOnMouseClicked(e -> {
                     if (e.getButton() == MouseButton.PRIMARY) {
-                        // cell.reveal();
+                        // game.playInteractionReveal(Cell cell) (returns List<Cell>) static
+                        // return all affected cells after interaction
+                        // for all affected cells, updateGraphics(Cell cell)
+                        // må ha bd.reveal() returns List<Cell>?
+                        // HADDE VORE BEST viss board ikkje blei referert til her i det heile,
+                        // controller-game-board-cell
                         bd.reveal(cell);
                         if (game.isWon()) {
                             won();
+                        } else if (game.isLost()) {
+                            // UUUH
                         }
                     } else if (e.getButton() == MouseButton.SECONDARY) {
-                        // cell.flag();
                         bd.flag(cell);
                         updateMineCount(bd);
 
@@ -230,10 +243,16 @@ public class MSController implements Initializable, CellListener {
     }
 
     public void handleReset() {
-        Game game = new Game(new Board(X_SIZE, CELL_SIZE), 0, "NORMAL");
+        // CRASHER PÅ MINE, MINE OVER CELL OG STACKPANE SCUFFAR,
+        Game game = new Game(new Board(Y_SIZE, X_SIZE), 0, "NORMAL");
         Board bd = game.getBoard();
         bd.init(game.getDifficulty());
         drawBoard(bd);
+        System.out.println(Integer.toString(bd.getMinesLeft()));
+        mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
+        // DRITA
+        timeline.stop();
+        timer.setText("Time: 0");
         mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
         startTimer(game);
     }
@@ -304,6 +323,11 @@ public class MSController implements Initializable, CellListener {
         System.out.println("WON!! YE");
     }
 
+    public void drawLost() {
+        // kryss viss flag og !isMine
+        // opne alle mines
+    }
+
     @Override
     public void cellChanged(Cell cell) {
         // temporary
@@ -317,11 +341,32 @@ public class MSController implements Initializable, CellListener {
             rect.setFill(Color.WHITESMOKE);
             stack.setDisable(true);
             if (cell.isMine()) {
-                txt.setText("X");
+                // txt.setText("X");
+                rect.setFill(new ImagePattern(mineImg));
             } else {
-                txt.setFill(Color.BLACK);
+                int mines = cell.getAdjacentMineCount();
+                txt.setText(mines == 0 ? " " : Integer.toString(mines));
+                switch (mines) {
+                    case 1:
+                        txt.setFill(Color.ROYALBLUE);
+                        break;
+                    case 2:
+                        txt.setFill(Color.FORESTGREEN);
+                        break;
+                    case 3:
+                        txt.setFill(Color.HOTPINK);
+                        break;
+                    case 4:
+                        txt.setFill(Color.DARKORCHID);
+                        break;
+                    case 5:
+                        txt.setFill(Color.MEDIUMAQUAMARINE);
+                        break;
+                    default:
+                        txt.setFill(Color.BLACK);
+                        break;
+                }
                 // txt.setText(Integer.toString(cell.getAdjacentMineCount()));
-                txt.setText(cell.getAdjacentMineCount() == 0 ? " " : Integer.toString(cell.getAdjacentMineCount()));
             }
         } else if (cell.isFlagged()) {
             // txt.setText("F");

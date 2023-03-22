@@ -10,6 +10,8 @@ public class Board {
     private int minesLeft;
 
     public Board(int ySize, int xSize) {
+        minesLeft = 0;
+        minesTotal = 0;
         grid = new Cell[ySize][xSize];
     }
 
@@ -65,10 +67,6 @@ public class Board {
 
     public Cell getCellAt(int y, int x) {
         return grid[y][x];
-    }
-
-    public void setCellAt(Cell cell, int y, int x) {
-        grid[y][x] = cell;
     }
 
     public int getRows() {

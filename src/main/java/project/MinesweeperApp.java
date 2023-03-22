@@ -4,15 +4,18 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class MinesweeperApp extends Application {
+    private Image mineImg = new Image(getClass().getResourceAsStream("/project/img/MineIcon50px.png"));
     // gi nåde i start
     // VH, VW, CELL_SIZE
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load((getClass().getResource("/project/GameScene1.fxml")));
         primaryStage.setTitle("MinesweeperFX");
+        primaryStage.getIcons().add(mineImg);
         primaryStage.setScene(new Scene(root, Controller.VW, Controller.VH + 30));
         primaryStage.show();
     }

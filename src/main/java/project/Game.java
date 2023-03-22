@@ -6,7 +6,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 
-public class Game {
+public class Game implements CellListener {
     private int timeElapsed;
     private Board board;
     private String difficulty;
@@ -51,8 +51,18 @@ public class Game {
         return (revealedCells + mines == cellsTotal);
     }
 
+    public void play(Cell cell) {
+        board.flag(cell);
+    }
+
     // kanskje game er cellListener -> game.rightClick() -> sjekk alt som i Controller.cellChanged() og basert på output frå checker, call Controller.setRevealGrapics/setFlagGraphics
     public boolean isLost() {
         return false;
+    }
+
+    @Override
+    public void cellChanged(Cell cell) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'cellChanged'");
     }
 }
