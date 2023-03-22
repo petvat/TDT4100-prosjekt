@@ -1,10 +1,5 @@
 package project;
 
-import java.util.Arrays;
-
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.util.Duration;
 
 public class Game implements CellListener {
     private int timeElapsed;

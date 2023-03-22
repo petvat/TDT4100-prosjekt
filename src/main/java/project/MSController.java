@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-//import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +12,8 @@ import java.util.ResourceBundle;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -37,10 +33,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-// CONTROLLER FOR NYTT GAME
-
 public class MSController implements Initializable, CellListener {
-    // Skal i teorien kunne endre alle desse
     public static final int VH = 800;
     public static final int VW = 800;
     public static final int CELL_SIZE = 40;
@@ -56,9 +49,7 @@ public class MSController implements Initializable, CellListener {
     private Map<Cell, StackPane> cellMap;
     private Game game;
     private GameSaveHandler saver;
-    // private String gameFile;
     private Timeline timeline;
-    // private timer
 
     // treng berre board, -> gå inn i board -> ha en "sjekker" som går igjennom alle
     // Cell og set opp grafikk etter det
@@ -97,7 +88,6 @@ public class MSController implements Initializable, CellListener {
 
         grid = new GridPane();
 
-        // ?????????
         saver = new GameSaveHandler();
         game = new Game(new Board(X_SIZE, Y_SIZE), 0, "NORMAL");
         Board bd = game.getBoard();
@@ -110,15 +100,8 @@ public class MSController implements Initializable, CellListener {
         border.setCenter(grid);
         startTimer(game);
 
-        // PRØVE
-        // gameFile = null;
-
-        // saveBox.setItems(FXCollections.observableArrayList(setSlots()));
-        // saveBox.setOnAction(this::handleSave);
         ObservableList<String> list = FXCollections.observableArrayList(setSlots());
         loadBox.setItems(list);
-        // loadBox.setOnAction(this::handleLoad);
-        // initSaveBox();
     }
 
     private void startTimer(Game game) {
@@ -149,13 +132,6 @@ public class MSController implements Initializable, CellListener {
         if (slots.isEmpty()) {
             slots.add("Wow, such empty ...");
         }
-
-        /*
-         * while (i < 4) {
-         * slots.add("--Empty slot" + Integer.toString(i) + "--");
-         * i++;
-         * }
-         */
         return slots;
     }
 
@@ -165,15 +141,9 @@ public class MSController implements Initializable, CellListener {
         // Lag Cell-grafikk
         for (int y = 0; y < bd.getRows(); y++) {
             for (int x = 0; x < bd.getCols(); x++) {
-
-                // DEL INN I NY CLASS?
-                // Må sette -2 fordi stroke tar 1px
                 Rectangle btn = new Rectangle(CELL_SIZE, CELL_SIZE);
                 Text txt = new Text();
 
-                // Default utsjånad
-                // btn.setFill(Color.GRAY);
-                // btn.setStroke(Color.LIGHTGRAY);
                 btn.setFill(new ImagePattern(cellImg));
                 txt.setFont(pixelFont);
                 txt.setText("");
@@ -183,8 +153,6 @@ public class MSController implements Initializable, CellListener {
 
                 Cell cell = bd.getCellAt(y, x);
                 cell.addChangeListener(this);
-                // Litt scuffed
-                // cell.addChangeListener(bd);
 
                 // Lag map for å finne igjen stack frå cell
                 cellMap.put(cell, stack);
@@ -207,7 +175,6 @@ public class MSController implements Initializable, CellListener {
                     } else if (e.getButton() == MouseButton.SECONDARY) {
                         bd.flag(cell);
                         updateMineCount(bd);
-
                     }
                 });
                 stack.setOnMouseEntered(e -> {
@@ -240,7 +207,6 @@ public class MSController implements Initializable, CellListener {
         System.out.println(game.getName());
     }
 
-    // SAVE AS METODE? + OVERWRITE?
     @FXML
     public void handleSave() {
         // getUserInputFilename()
@@ -254,20 +220,14 @@ public class MSController implements Initializable, CellListener {
                 game.setName(result.get());
             }
         }
-
         try {
             saver.save(game);
-            // GameSaveHandler.save(gameFile, game)
-            // setSlots();
-
         } catch (FileNotFoundException e) {
             System.out.println("File not found." + e);
-            //
         }
         System.out.println(game.getName());
         ObservableList<String> list = FXCollections.observableArrayList(setSlots());
         loadBox.setItems(list);
-
     }
 
     @FXML
@@ -282,10 +242,8 @@ public class MSController implements Initializable, CellListener {
         String file = selectedSavedFile.toString();
         System.out.println(file + "SJÅ HER");
         try {
-            // handle if game object is null
             if (saver.load(file) == null || file == game.getName()) {
                 return;
-                // game = GameSaveHandler.load(file)
             }
             game = saver.load(file);
             game.setName(file);
@@ -297,8 +255,6 @@ public class MSController implements Initializable, CellListener {
             timeline.stop();
             mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
             startTimer(game);
-            // GRUNNLAG -> cellChanged gir sannsynlegvis "Cell finst ikkje i cellMap" fordi
-            // ny celle
             System.out.println(game.getName());
             // HANDLE REINITIALISATION OF CELLS EASY WAY
             // ser no at scuffed med controller implements listener, fordi dette må vere her
@@ -323,18 +279,13 @@ public class MSController implements Initializable, CellListener {
 
     @Override
     public void cellChanged(Cell cell) {
-        // temporary
-        // updateMineCount(cell.getBoard());
-        // start timer ?
         StackPane stack = (StackPane) cellMap.get(cell);
         Rectangle rect = (Rectangle) stack.getChildren().get(0);
         Text txt = (Text) stack.getChildren().get(1);
-
         if (cell.isRevealed()) {
             rect.setFill(Color.WHITESMOKE);
             stack.setDisable(true);
             if (cell.isMine()) {
-                // txt.setText("X");
                 rect.setFill(new ImagePattern(mineImg));
             } else {
                 int mines = cell.getAdjacentMineCount();
@@ -365,9 +316,6 @@ public class MSController implements Initializable, CellListener {
                 // txt.setText(Integer.toString(cell.getAdjacentMineCount()));
             }
         } else if (cell.isFlagged()) {
-            // txt.setText("F");
-            // txt.setFill(Color.WHITE);
-            // rect.setFill(Color.RED);
             rect.setFill(new ImagePattern(FlaggedImg));
         } else if (!cell.isFlagged()) {
             // default
@@ -375,9 +323,6 @@ public class MSController implements Initializable, CellListener {
             // rect.setFill(Color.GRAY);
             txt.setText("");
         }
-
-        // PLACEHOLDER
-        // GÅR IKKJE
     }
 
     public void updateMineCount(Board bd) {

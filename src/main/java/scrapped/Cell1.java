@@ -1,7 +1,9 @@
-package project;
+package scrapped;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import project.CellListener;
 
 public class Cell {
     private int x, y;

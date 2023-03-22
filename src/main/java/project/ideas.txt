@@ -1,0 +1,56 @@
+/* GAMESAVEHANDELER
+'''''''''''''''''''''''''''''''''''''''''''
+ * try(
+ * 
+ * ObjectInputStream in = new ObjectInputStream(new FileInputStream(new
+ * File(getPath(file)))))
+ * {
+ * Game inGame = null;
+ * inGame = (Game) in.readObject();
+ * in.close();
+ * // SETT OPP GAME
+ * // MANIPULER
+ * // SKAL VERE I MAIN MENU?
+ * // I handleLoad() {currenctGame = this.load(file)}
+ * return inGame;
+ * }catch(IOException|
+ * ClassNotFoundException e)
+ * {
+ * }
+ * {
+ * return null;
+ * }
+ * 
+ * // ENTEN NY FUNKSJON -> revealNotRecursive() : TAR OG SETT TIL reveal og
+ * berre
+ * // det
+ * // BEDRE KANSKJE -> cell.computeAdjacents
+ * 
+ * }
+ * 
+ */
+
+// SCANNER 2D
+// SCANNER -> MINE TRUE ->
+// SCANNER -> FLAGGED TRUE -> FLAG()
+// ALLE
+// SCANNER -> REVEALED TRUE -> REVEAL()
+// .................
+
+// handle update in Controller
+
+// anna metode
+// if ("TRUE" && !cell.isMine()) {
+// cell.setIsMine(true);
+// }
+// if ("TRUE" && !cell.isFlagged()) {
+// cell.flag();
+// då vert controller automatisk updated
+// kva med tinga som ikkje vert påverka?
+// vi MÅ kunne kalle cell.update() på ein annan måte då
+// Stor flaw! må uansett forall update()
+// workaround: if (!isflagged && !isRevealed) update()
+// }
+// else if ("TRUE" && !cell.isRevealed()) {
+// cell.reveal();
+// }

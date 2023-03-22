@@ -1,6 +1,9 @@
-package project;
+package scrapped;
 
 import java.util.Arrays;
+
+import project.CellListener;
+import project.MineCounter;
 
 public class BoardOLD implements CellListener {
 

@@ -1,18 +1,9 @@
 package project;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Serializable;
-import java.io.Writer;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class GameSaveHandler {
@@ -90,9 +81,7 @@ public class GameSaveHandler {
             return game;
         }
     }
-
-    // IF # REVEALED TRUE && !cell.isRevealed() -> CELL.REVEAL()
-    // IF NOT EXIST CREATE QUESTION
+    
     private static String getPath(String filename) {
         return (PATH + filename + EXTENSION);
     }

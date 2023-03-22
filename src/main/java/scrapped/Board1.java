@@ -1,6 +1,8 @@
-package project;
+package scrapped;
 
 import java.util.List;
+
+import project.MineCounter;
 
 public class Board1 {
     private Cell[][] grid;

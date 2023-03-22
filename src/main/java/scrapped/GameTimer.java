@@ -1,4 +1,4 @@
-package project;
+package scrapped;
 
 
 public class GameTimer {
