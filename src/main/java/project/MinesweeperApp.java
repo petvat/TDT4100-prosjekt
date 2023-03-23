@@ -10,11 +10,12 @@ import scrapped.Controller;
 
 public class MinesweeperApp extends Application {
     private Image mineImg = new Image(getClass().getResourceAsStream("/project/img/MineIcon50px.png"));
+
     // gi nåde i start
     // VH, VW, CELL_SIZE
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load((getClass().getResource("/project/GameScene1.fxml")));
+        Parent root = FXMLLoader.load((getClass().getResource("/project/MSmain.fxml")));
         primaryStage.setTitle("MinesweeperFX");
         primaryStage.getIcons().add(mineImg);
         primaryStage.setScene(new Scene(root, Controller.VW, Controller.VH + 30));
@@ -26,3 +27,7 @@ public class MinesweeperApp extends Application {
         launch(args);
     }
 }
+
+
+// Start timer ved første click/ if not started start() for right/left click event
+// smartare mine-velging

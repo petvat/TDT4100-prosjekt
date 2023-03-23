@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
@@ -95,8 +94,7 @@ public class MSController implements Initializable, CellListener {
         bd.init(game.getDifficulty());
         drawBoard(bd);
 
-        mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
-
+        updateMineCount(bd);
         border.setCenter(grid);
         startTimer(game);
 
@@ -107,7 +105,7 @@ public class MSController implements Initializable, CellListener {
     private void startTimer(Game game) {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             game.timeElapsed();
-            timer.setText("Time: " + Integer.toString(game.getTimeElapsed()));
+            timer.setText("TIME: " + Integer.toString(game.getTimeElapsed()));
         }));
         timeline.setCycleCount(1000);
         timeline.play();
@@ -198,11 +196,11 @@ public class MSController implements Initializable, CellListener {
         bd.init(game.getDifficulty());
         drawBoard(bd);
         System.out.println(Integer.toString(bd.getMinesLeft()));
-        mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
+        updateMineCount(bd);
         // DRITA
         timeline.stop();
-        timer.setText("Time:  ");
-        mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
+        timer.setText("TIME  ");
+        updateMineCount(bd);
         startTimer(game);
         System.out.println(game.getName());
     }
@@ -250,10 +248,10 @@ public class MSController implements Initializable, CellListener {
             Board bd = game.getBoard();
             drawBoard(bd);
             System.out.println(Integer.toString(bd.getMinesLeft()));
-            mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
+            updateMineCount(bd);
             // DRITA
             timeline.stop();
-            mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
+            updateMineCount(bd);
             startTimer(game);
             System.out.println(game.getName());
             // HANDLE REINITIALISATION OF CELLS EASY WAY
@@ -287,13 +285,11 @@ public class MSController implements Initializable, CellListener {
             stack.setDisable(true);
             if (cell.isMine()) {
                 rect.setFill(new ImagePattern(mineImg));
+
             } else {
                 int mines = cell.getAdjacentMineCount();
-                txt.setText(Integer.toString(mines));
+                txt.setText(mines == 0 ? "" : Integer.toString(mines));
                 switch (mines) {
-                    case 0:
-                        txt.setFill(Color.LIGHTGRAY);
-                        break;
                     case 1:
                         txt.setFill(Color.ROYALBLUE);
                         break;
@@ -326,7 +322,10 @@ public class MSController implements Initializable, CellListener {
     }
 
     public void updateMineCount(Board bd) {
-        mineCount.setText("Mines: " + Integer.toString(bd.getMinesLeft()));
+        mineCount.setText("MINES: " + Integer.toString(bd.getMinesLeft()));
+    }
+
+    public void updateTimer() {
 
     }
 }
