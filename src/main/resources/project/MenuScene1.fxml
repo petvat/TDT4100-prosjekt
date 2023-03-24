@@ -18,7 +18,7 @@
                   <Label text="WIDTH" />
                   <Slider blockIncrement="1.0" majorTickUnit="1.0" max="20.0" min="10.0" minorTickCount="1" prefHeight="29.0" prefWidth="200.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="20.0" fx:id="xSlider" />
                   <Label text="MINES" />
-                  <Slider fx:id="mineSlider" blockIncrement="1.0" min="1.0" minorTickCount="25" prefHeight="43.0" prefWidth="389.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="70.0" />
+                  <Slider fx:id="mineSlider" blockIncrement="1.0" majorTickUnit="10.0" min="1.0" minorTickCount="10" prefHeight="43.0" prefWidth="389.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="70.0" />
                </children>
             </VBox>
          </center>

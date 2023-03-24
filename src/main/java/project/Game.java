@@ -1,7 +1,5 @@
 package project;
 
-import java.util.List;
-
 public class Game {
     private int timeElapsed;
     private Board board;
@@ -32,15 +30,15 @@ public class Game {
         return isFirstRevealed;
     }
 
-   public void ensureSafeFirstRevealed(Cell cell) {
+    public void ensureSafeFirstRevealed(Cell cell) {
         // rar delegation
         board.ensureSafeFirstRevealed(cell);
         setFirstRevealed(true);
-   }
+    }
 
-   public void setFirstRevealed(boolean isFirstRevealed) {
+    public void setFirstRevealed(boolean isFirstRevealed) {
         this.isFirstRevealed = isFirstRevealed;
-   }
+    }
 
     public int getTimeElapsed() {
         return timeElapsed;
@@ -55,8 +53,8 @@ public class Game {
         int cellsTotal = 0;
         int revealedCells = 0;
         // Gjer i board
-        for (int y = 0; y < board.getCols(); y++) {
-            for (int x = 0; x < board.getRows(); x++) {
+        for (int y = 0; y < board.getRows(); y++) {
+            for (int x = 0; x < board.getCols(); x++) {
                 cellsTotal++;
                 if (!board.getCellAt(y, x).isMine() && board.getCellAt(y, x).isRevealed()) {
                     revealedCells++;
@@ -86,8 +84,8 @@ public class Game {
     // Controller.cellChanged() og basert på output frå checker, call
     // Controller.setRevealGrapics/setFlagGraphics
     public boolean isLost() {
-        for (int y = 0; y < board.getCols(); y++) {
-            for (int x = 0; x < board.getRows(); x++) {
+        for (int y = 0; y < board.getRows(); y++) {
+            for (int x = 0; x < board.getCols(); x++) {
                 if (board.getCellAt(y, x).isMine() && board.getCellAt(y, x).isRevealed()) {
                     return true;
                 }
@@ -102,7 +100,7 @@ public class Game {
                 if (board.getCellAt(y, x).isMine() && board.getCellAt(y, x).isRevealed()) {
                     board.reveal(board.getCellAt(y, x));
                 }
-                // set wrongly flagged, sikkert best i controller 
+                // set wrongly flagged, sikkert best i controller
             }
         }
     }

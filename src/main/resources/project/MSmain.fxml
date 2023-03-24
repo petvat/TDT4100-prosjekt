@@ -10,7 +10,7 @@
 
 <AnchorPane id="root" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="800.0" stylesheets="project/style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.MSController">
    <children>
-      <BorderPane id="border" fx:id="border" prefHeight="800.0" prefWidth="800.0">
+      <BorderPane id="border" fx:id="border">
          <top>
             <HBox id="top" prefHeight="27.0" prefWidth="328.0" BorderPane.alignment="CENTER">
                <children>
@@ -21,12 +21,12 @@
                   <Text id="mineCount" fx:id="mineCount" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text" text="MINES" wrappingWidth="103.47002565860748">
                      
                   </Text>
-                  <Region prefHeight="27.0" prefWidth="189.0" />
-                  <Button id="reset" fx:id="reset" StyleClass="text" mnemonicParsing="false" onAction="#handleReset" prefHeight="25.0" prefWidth="143.0" text="NEW GAME">
+                  <Region prefHeight="27.0" prefWidth="39.0" HBox.hgrow="ALWAYS" />
+                  <Button id="reset" fx:id="reset" StyleClass="text" mnemonicParsing="false" onAction="#handleReset" prefHeight="25.0" prefWidth="137.0" text="NEW GAME">
                      </Button>
                   <Button id="save" fx:id="saveBtn" mnemonicParsing="false" onAction="#handleSave" prefHeight="25.0" prefWidth="79.0" styleClass="text" text="Save">
                      </Button>
-                  <ComboBox fx:id="loadBox" onAction="#handleLoad" prefHeight="25.0" prefWidth="174.0" promptText="Load ..." />
+                  <ComboBox fx:id="loadBox" onAction="#handleLoad" prefHeight="25.0" prefWidth="131.0" promptText="Load ..." />
                </children>
             </HBox>
          </top>

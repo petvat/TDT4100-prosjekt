@@ -2,16 +2,13 @@ package project;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
-
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.print.PrintColor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -42,14 +39,6 @@ public class MenuController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        /*
-         * List<Slider> sliders = new ArrayList<>(Arrays.asList(xSlider, ySlider,
-         * mineSlider));
-         * for (Slider slider : sliders) {
-         * slider.setShowTickLabels(true);
-         * slider.setShowTickMarks(true);
-         * }
-         */
         var product = Bindings.createIntegerBinding(() -> (int) (ySlider.getValue() * xSlider.getValue() / 4),
                 ySlider.valueProperty(), xSlider.valueProperty());
         mineSlider.maxProperty().bind(product);
@@ -57,19 +46,25 @@ public class MenuController implements Initializable {
 
     public void createNewGame(ActionEvent event) throws IOException {
         int y = (int) ySlider.getValue();
+        System.out.println(y);
         int x = (int) xSlider.getValue();
+        System.out.println(x);
         int mines = (int) mineSlider.getValue();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/project/MSmain.fxml"));
         root = loader.load();
         MSController msController = loader.getController();
+        // x, y????
         msController.handleNewGame(y, x, mines);
 
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         // dynamisk, umulig?
-        scene = new Scene(root, MSController.VW, MSController.VH + 30);
+        // MSController.CELL_SIZE * X/Y KAN FUNKE????
+        scene = new Scene(root, MSController.CELL_SIZE * x, MSController.CELL_SIZE * y + 30);
         stage.setScene(scene);
         stage.show();
+
+        // YOOOOOOOOOOOOO KVIFOR FEIL HEIGHT/WIDTH
     }
 
     public void cancel(ActionEvent event) throws IOException {

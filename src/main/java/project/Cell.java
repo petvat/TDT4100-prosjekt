@@ -72,6 +72,10 @@ public class Cell {
         }
     }
 
+    public List<CellListener> getListeners() {
+        return listeners;
+    }
+
     public void addChangeListener(CellListener listener) {
         listeners.add(listener);
     }

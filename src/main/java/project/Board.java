@@ -57,8 +57,8 @@ public class Board {
         int y = r.nextInt(getRows());
         int x = r.nextInt(getCols());
         while (getCellAt(y, x).isMine()) {
-            y = r.nextInt(getCols());
-            x = r.nextInt(getRows());
+            y = r.nextInt(getRows());
+            x = r.nextInt(getCols());
         }
         return getCellAt(y, x);
     }

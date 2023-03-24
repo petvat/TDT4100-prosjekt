@@ -24,7 +24,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
@@ -172,7 +171,9 @@ public class MSController implements Initializable, CellListener {
                 StackPane stack = new StackPane(btn, txt);
 
                 Cell cell = bd.getCellAt(y, x);
-                cell.addChangeListener(this);
+                if (!cell.getListeners().contains(this)) {
+                    cell.addChangeListener(this);
+                }
 
                 // Lag map for å finne igjen stack frå cell
                 cellMap.put(cell, stack);
@@ -215,11 +216,13 @@ public class MSController implements Initializable, CellListener {
                     btn.setTranslateX(0);
                     btn.setTranslateY(0);
                 });
-                grid.add(stack, y, x);
+                grid.add(stack, x, y);
             }
         }
     }
 
+    // nytt namn
+    @FXML
     public void handleReset(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/project/MenuScene1.fxml"));
         parent = loader.load();
@@ -255,6 +258,8 @@ public class MSController implements Initializable, CellListener {
 
             if (result.isPresent()) {
                 game.setName(result.get());
+            } else {
+                return;
             }
         }
         try {
@@ -296,6 +301,13 @@ public class MSController implements Initializable, CellListener {
                     bd.getCellAt(y, x).update();
                 }
             }
+            // dynamisk, umulig?
+            // scene.setHeight(CELL_SIZE * bd.getRows())
+            // PSEUDO FIKS!!!
+            // rart, stem fjern
+            stage = (Stage) grid.getScene().getWindow();
+            stage.setWidth(CELL_SIZE * bd.getCols());
+            stage.setHeight(CELL_SIZE * bd.getRows() + 30);
         } catch (FileNotFoundException e) {
             System.out.println("File not found." + e);
         }

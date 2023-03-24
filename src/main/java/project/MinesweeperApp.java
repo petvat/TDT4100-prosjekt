@@ -18,7 +18,7 @@ public class MinesweeperApp extends Application {
         Parent root = FXMLLoader.load((getClass().getResource("/project/MSmain.fxml")));
         primaryStage.setTitle("MinesweeperFX");
         primaryStage.getIcons().add(mineImg);
-        primaryStage.setScene(new Scene(root, Controller.VW, Controller.VH + 30));
+        primaryStage.setScene(new Scene(root, MSController.VW, MSController.VH + 30));
         primaryStage.show();
     }
 
@@ -28,7 +28,8 @@ public class MinesweeperApp extends Application {
     }
 }
 
-
-// Start timer ved første click/ if not started start() for right/left click event
+// Start timer ved første click/ if not started start() for right/left click
+// event
 // smartare mine-velging, sett ex 70 celle fordel slik at akkurat 70, mulig
-// ha cell changed i  game og la play returnere liste Cell ... cells, ha change graphics på alle
+// ha cell changed i game og la play returnere liste Cell ... cells, ha change
+// graphics på alle
