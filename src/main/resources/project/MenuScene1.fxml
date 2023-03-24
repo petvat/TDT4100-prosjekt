@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="project/style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.MenuController">
+   <children>
+      <BorderPane layoutX="109.0" layoutY="32.0" prefHeight="232.0" prefWidth="389.0">
+         <center>
+            <VBox prefHeight="217.0" prefWidth="389.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label prefHeight="17.0" prefWidth="197.0" text="HEIGHT" />
+                  <Slider fx:id="ySlider" blockIncrement="1.0" majorTickUnit="1.0" max="20.0" min="10.0" minorTickCount="1" prefHeight="46.0" prefWidth="389.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="20.0" />
+                  <Label text="WIDTH" />
+                  <Slider blockIncrement="1.0" majorTickUnit="1.0" max="20.0" min="10.0" minorTickCount="1" prefHeight="29.0" prefWidth="200.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="20.0" fx:id="xSlider" />
+                  <Label text="MINES" />
+                  <Slider fx:id="mineSlider" blockIncrement="1.0" min="1.0" minorTickCount="25" prefHeight="43.0" prefWidth="389.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="70.0" />
+               </children>
+            </VBox>
+         </center>
+      </BorderPane>
+      <Button fx:id="newGameBtn" layoutX="187.0" layoutY="288.0" mnemonicParsing="false" onAction="#createNewGame" prefHeight="45.0" prefWidth="247.0" text="CREATE NEW GAME" />
+      <Button fx:id="cancelBtn" layoutX="232.0" layoutY="344.0" mnemonicParsing="false" onAction="#cancel" prefHeight="38.0" prefWidth="155.0" text="CANCEL" />
+   </children>
+</AnchorPane>

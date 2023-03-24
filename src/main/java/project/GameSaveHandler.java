@@ -21,8 +21,8 @@ public class GameSaveHandler {
         }
         try (PrintWriter wr = new PrintWriter(file)) {
             Board bd = game.getBoard();
-            String gameInfo = String.format("%d,%d,%d,%d,%d, %s", bd.getCols(), bd.getRows(), game.getTimeElapsed(),
-                    bd.getMinesLeft(), bd.getMinesTotal(), game.getDifficulty());
+            String gameInfo = String.format("%d,%d,%d,%d,%d,%d", bd.getCols(), bd.getRows(), game.getTimeElapsed(),
+                    bd.getMinesLeft(), game.getMineCount(), game.isFirstRevealed() ? 1 : 0);
             wr.print(gameInfo);
             for (int y = 0; y < bd.getCols(); y++) {
                 for (int x = 0; x < bd.getRows(); x++) {
@@ -41,7 +41,6 @@ public class GameSaveHandler {
         }
     }
 
-
     public Game load(String filename) throws FileNotFoundException {
         File file = new File(PATH + filename + EXTENSION);
         try (Scanner sc = new Scanner(file)) {
@@ -51,7 +50,7 @@ public class GameSaveHandler {
             int timeElapsed = Integer.parseInt(ps[2]);
             int minesLeft = Integer.parseInt(ps[3]);
             int minesTotal = Integer.parseInt(ps[4]);
-            String difficulty = ps[5];
+            boolean isFirstRevealed = Integer.parseInt(ps[5]) == 1 ? true : false;
 
             Board bd = new Board(cols, rows);
             // retarda løysing
@@ -68,7 +67,7 @@ public class GameSaveHandler {
                 boolean isRevealed = Integer.parseInt(bools[2]) == 1 ? true : false;
                 int adjacentMineCount = Integer.parseInt(bools[3]);
 
-                Cell cell = new Cell(y, x, isMine);
+                Cell cell = new Cell(y, x);
                 // cell.setBoard(bd);
                 cell.setRevealed(isRevealed);
                 cell.setFlagged(isFlagged);
@@ -77,11 +76,12 @@ public class GameSaveHandler {
                 bd.getGrid()[y][x] = cell;
             }
             sc.close();
-            Game game = new Game(bd, timeElapsed, difficulty);
+            Game game = new Game(bd, timeElapsed, minesTotal);
+            game.setFirstRevealed(isFirstRevealed);
             return game;
         }
     }
-    
+
     private static String getPath(String filename) {
         return (PATH + filename + EXTENSION);
     }

@@ -12,10 +12,10 @@ public class Cell {
 
     private int adjacentMineCount;
 
-    public Cell(int y, int x, boolean isMine) {
+    public Cell(int y, int x) {
         this.y = y;
         this.x = x;
-        this.isMine = isMine;
+        isMine = false;
         isRevealed = false;
         isFlagged = false;
         listeners = new ArrayList<>();

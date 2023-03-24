@@ -2,6 +2,7 @@ package project;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +14,17 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
@@ -31,13 +38,15 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 public class MSController implements Initializable, CellListener {
     public static final int VH = 800;
     public static final int VW = 800;
     public static final int CELL_SIZE = 40;
-    public static final int X_SIZE = VW / CELL_SIZE;
-    public static final int Y_SIZE = VH / CELL_SIZE;
+    public int X_SIZE = VW / CELL_SIZE;
+    public int Y_SIZE = VH / CELL_SIZE;
+    public int MINE_COUNT = 75;
     private Image mineImg = new Image(getClass().getResourceAsStream("/project/img/MineIcon50px.png"));
     private Image cellImg = new Image(getClass().getResourceAsStream("/project/img/mineTile25px.png"));
     private Image FlaggedImg = new Image(getClass().getResourceAsStream("/project/img/Flagged.png"));
@@ -49,6 +58,10 @@ public class MSController implements Initializable, CellListener {
     private Game game;
     private GameSaveHandler saver;
     private Timeline timeline;
+    private Stage stage;
+    private Scene scene;
+    /// !!!
+    private Parent parent;
 
     // treng berre board, -> gå inn i board -> ha en "sjekker" som går igjennom alle
     // Cell og set opp grafikk etter det
@@ -86,10 +99,11 @@ public class MSController implements Initializable, CellListener {
     public void initialize(URL location, ResourceBundle resources) {
         grid = new GridPane();
         saver = new GameSaveHandler();
-        game = new Game(new Board(X_SIZE, Y_SIZE), 0, "NORMAL");
+        game = new Game(new Board(Y_SIZE, X_SIZE), 0, MINE_COUNT);
+        // NEW GAME
         Board bd = game.getBoard();
         // litt snodig
-        bd.init(game.getDifficulty());
+        bd.init(game.getMineCount());
         drawBoard(bd);
         updateMineCount(bd);
         border.setCenter(grid);
@@ -131,15 +145,13 @@ public class MSController implements Initializable, CellListener {
         return slots;
     }
 
-    private void setUpGame() {
-        Board bd = game.getBoard();
-        drawBoard(bd);
-        updateMineCount(bd);
-        startTimer(game);
-    }
-
-    public void updateLoadMenu() {
-
+    public void handleNewGame(int ySize, int xSize, int mines) {
+        this.Y_SIZE = ySize;
+        this.X_SIZE = xSize;
+        this.MINE_COUNT = mines;
+        timeline.stop();
+        initialize(null, null);
+        game.setName(null);
     }
 
     private void drawBoard(Board bd) {
@@ -173,13 +185,21 @@ public class MSController implements Initializable, CellListener {
                         // må ha bd.reveal() returns List<Cell>?
                         // HADDE VORE BEST viss board ikkje blei referert til her i det heile,
                         // controller-game-board-cell
-                        // KUNNE gått game.CellChanged(Cell cell) returns Cell ... cells 
+                        // KUNNE gått game.CellChanged(Cell cell) returns Cell ... cells
+                        // hadde vore best men vanskeleg å lagre alle andre celler og sende dei til
+                        // controller
+                        // komplisert men samle alle med flag action -> alle etter dette er med i liste,
+                        // change graphics til alle i liste, static buffer fyll opp i game
+                        if (!game.isFirstRevealed()) {
+                            game.ensureSafeFirstRevealed(cell);
+                        }
                         bd.reveal(cell);
                         // workaround cell.isMine() -> drawLost()
                         if (game.isWon()) {
-                            won();
+                            drawWon();
                         } else if (game.isLost()) {
-                            // UUUH
+                            // game.setLost();
+                            drawLost();
                         }
                     } else if (e.getButton() == MouseButton.SECONDARY) {
                         bd.flag(cell);
@@ -199,20 +219,29 @@ public class MSController implements Initializable, CellListener {
         }
     }
 
-    public void handleReset() {
-        game = new Game(new Board(Y_SIZE, X_SIZE), 0, "NORMAL");
-        game.setName(null);
-        Board bd = game.getBoard();
-        bd.init(game.getDifficulty());
-        drawBoard(bd);
-        System.out.println(Integer.toString(bd.getMinesLeft()));
-        // DRITA
-        timeline.stop(); // 
-        //timer.setText("TIME  ");
-        updateMineCount(bd);
-        startTimer(game);
-        System.out.println(game.getName());
-        //rotete
+    public void handleReset(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/project/MenuScene1.fxml"));
+        parent = loader.load();
+        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        scene = new Scene(parent);
+        stage.setScene(scene);
+        stage.show();
+
+        // rotete
+        /*
+         * game = new Game(new Board(Y_SIZE, X_SIZE), 0, "NORMAL");
+         * game.setName(null);
+         * Board bd = game.getBoard();
+         * bd.init(game.getDifficulty());
+         * drawBoard(bd);
+         * System.out.println(Integer.toString(bd.getMinesLeft()));
+         * // DRITA
+         * timeline.stop(); //
+         * //timer.setText("TIME  ");
+         * updateMineCount(bd);
+         * startTimer(game);
+         * System.out.println(game.getName());
+         */
     }
 
     @FXML
@@ -271,11 +300,12 @@ public class MSController implements Initializable, CellListener {
         }
     }
 
-    public void won() {
+    public void drawWon() {
         System.out.println("WON!! YE");
     }
 
     public void drawLost() {
+        System.out.println("Lost");
         // kryss viss flag og !isMine
         // opne alle mines
     }

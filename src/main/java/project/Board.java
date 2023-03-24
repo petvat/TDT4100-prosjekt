@@ -2,44 +2,61 @@ package project;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Board {
     private Cell[][] grid;
     private double mineDensity;
     private int minesTotal;
     private int minesLeft;
-    //NORMAL
+    // NORMAL
 
     public Board(int ySize, int xSize) {
-        minesLeft = 0;
-        minesTotal = 0;
         grid = new Cell[ySize][xSize];
     }
 
     // Init board med vanskegrad ie minetettleik
-    public void init(String difficulty) {
-        switch (difficulty.toUpperCase()) {
-            case "EASY":
-                mineDensity = 0.1;
-            case "NORMAL":
-                mineDensity = 0.12625;
-            case "HARD":
-                mineDensity = 0.2;
-            default:
-                mineDensity = 0.2;
-        }
+    public void init(int mines) {
+        minesLeft = mines;
+        minesTotal = mines;
         // Sett opp grid og legg til mine
         for (int y = 0; y < getRows(); y++) {
             for (int x = 0; x < getCols(); x++) {
-                Cell cell = new Cell(y, x, Math.random() < mineDensity);
+                Cell cell = new Cell(y, x);
+                cell.setIsMine(false);
                 grid[y][x] = cell;
-                // Samle miner til minesTotal
-                if (cell.isMine()) {
-                    minesTotal++;
-                    minesLeft++;
+            }
+        }
+        for (int i = 0; i < minesTotal; i++) {
+            findRandomNonMineCell().setIsMine(true);
+        }
+    }
+
+    public void ensureSafeFirstRevealed(Cell cell) {
+        if (cell.isMine()) {
+            cell.setIsMine(false);
+            findRandomNonMineCell().setIsMine(true);
+        }
+        List<Cell> adjacents = computeAdjacents(cell);
+        if (computeAdjacentMineCount(adjacents) != 0) {
+            for (Cell adjacent : adjacents) {
+                if (adjacent.isMine()) {
+                    adjacent.setIsMine(false);
+                    findRandomNonMineCell().setIsMine(true);
                 }
             }
         }
+    }
+
+    public Cell findRandomNonMineCell() {
+        Random r = new Random();
+        int y = r.nextInt(getRows());
+        int x = r.nextInt(getCols());
+        while (getCellAt(y, x).isMine()) {
+            y = r.nextInt(getCols());
+            x = r.nextInt(getRows());
+        }
+        return getCellAt(y, x);
     }
 
     public void setMinesTotal(int minesTotal) {
