@@ -42,7 +42,11 @@ public class Board {
             for (Cell adjacent : adjacents) {
                 if (adjacent.isMine()) {
                     adjacent.setIsMine(false);
-                    findRandomNonMineCell().setIsMine(true);
+                    Cell randCell = findRandomNonMineCell();
+                    while (adjacents.contains(randCell)) {
+                        randCell = findRandomNonMineCell();
+                    }
+                    randCell.setIsMine(true);
                 }
             }
         }

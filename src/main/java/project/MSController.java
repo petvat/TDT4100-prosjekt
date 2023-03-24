@@ -100,6 +100,7 @@ public class MSController implements Initializable, CellListener {
         grid = new GridPane();
         saver = new GameSaveHandler();
         game = new Game(new Board(Y_SIZE, X_SIZE), 0, MINE_COUNT);
+        game.setName(null);
         // NEW GAME
         Board bd = game.getBoard();
         // litt snodig
