@@ -75,7 +75,7 @@ public class MSController implements Initializable, CellListener {
     private BorderPane border;
 
     @FXML
-    private ComboBox loadBox;
+    private ComboBox<String> loadBox;
 
     private GridPane grid;
 
@@ -84,20 +84,16 @@ public class MSController implements Initializable, CellListener {
     // NEW GAME
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         grid = new GridPane();
-
         saver = new GameSaveHandler();
         game = new Game(new Board(X_SIZE, Y_SIZE), 0, "NORMAL");
         Board bd = game.getBoard();
         // litt snodig
         bd.init(game.getDifficulty());
         drawBoard(bd);
-
         updateMineCount(bd);
         border.setCenter(grid);
         startTimer(game);
-
         ObservableList<String> list = FXCollections.observableArrayList(setSlots());
         loadBox.setItems(list);
     }
@@ -129,8 +125,21 @@ public class MSController implements Initializable, CellListener {
         }
         if (slots.isEmpty()) {
             slots.add("Wow, such empty ...");
+            // enklaste fjern denne ELLER syte for removeSave()
+            // legge til ved scenebuilder og fjern etter første save
         }
         return slots;
+    }
+
+    private void setUpGame() {
+        Board bd = game.getBoard();
+        drawBoard(bd);
+        updateMineCount(bd);
+        startTimer(game);
+    }
+
+    public void updateLoadMenu() {
+
     }
 
     private void drawBoard(Board bd) {
@@ -164,7 +173,9 @@ public class MSController implements Initializable, CellListener {
                         // må ha bd.reveal() returns List<Cell>?
                         // HADDE VORE BEST viss board ikkje blei referert til her i det heile,
                         // controller-game-board-cell
+                        // KUNNE gått game.CellChanged(Cell cell) returns Cell ... cells 
                         bd.reveal(cell);
+                        // workaround cell.isMine() -> drawLost()
                         if (game.isWon()) {
                             won();
                         } else if (game.isLost()) {
@@ -189,25 +200,23 @@ public class MSController implements Initializable, CellListener {
     }
 
     public void handleReset() {
-        // CRASHER PÅ MINE, MINE OVER CELL OG STACKPANE SCUFFAR,
         game = new Game(new Board(Y_SIZE, X_SIZE), 0, "NORMAL");
         game.setName(null);
         Board bd = game.getBoard();
         bd.init(game.getDifficulty());
         drawBoard(bd);
         System.out.println(Integer.toString(bd.getMinesLeft()));
-        updateMineCount(bd);
         // DRITA
-        timeline.stop();
-        timer.setText("TIME  ");
+        timeline.stop(); // 
+        //timer.setText("TIME  ");
         updateMineCount(bd);
         startTimer(game);
         System.out.println(game.getName());
+        //rotete
     }
 
     @FXML
     public void handleSave() {
-        // getUserInputFilename()
         if (game.getName() == null) {
             TextInputDialog tid = new TextInputDialog();
             tid.setTitle("Save game");
@@ -230,7 +239,6 @@ public class MSController implements Initializable, CellListener {
 
     @FXML
     public void handleLoad() {
-        System.out.println("trykk på load");
         // ENTEN LOAD(FILE, GAME) FOR Å SLEPPE Å LAGE NYTT GAME
         // PROS: ENKELT Å FIKSE, CONS: GAME BOARD-STORLEIK MÅ VERE FIXED
         // ELLER DRAWBOARD() HER
@@ -238,7 +246,6 @@ public class MSController implements Initializable, CellListener {
         if (selectedSavedFile == null)
             return;
         String file = selectedSavedFile.toString();
-        System.out.println(file + "SJÅ HER");
         try {
             if (saver.load(file) == null || file == game.getName()) {
                 return;
@@ -247,8 +254,6 @@ public class MSController implements Initializable, CellListener {
             game.setName(file);
             Board bd = game.getBoard();
             drawBoard(bd);
-            System.out.println(Integer.toString(bd.getMinesLeft()));
-            updateMineCount(bd);
             // DRITA
             timeline.stop();
             updateMineCount(bd);
@@ -309,14 +314,12 @@ public class MSController implements Initializable, CellListener {
                         txt.setFill(Color.BLACK);
                         break;
                 }
-                // txt.setText(Integer.toString(cell.getAdjacentMineCount()));
             }
         } else if (cell.isFlagged()) {
             rect.setFill(new ImagePattern(FlaggedImg));
         } else if (!cell.isFlagged()) {
             // default
             rect.setFill(new ImagePattern(cellImg));
-            // rect.setFill(Color.GRAY);
             txt.setText("");
         }
     }

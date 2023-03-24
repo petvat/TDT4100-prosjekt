@@ -6,6 +6,8 @@ public class Game implements CellListener {
     private Board board;
     private String difficulty;
     private boolean isWon;
+    private boolean isLost;
+    private boolean isFirstRevealed;
     private String name;
 
     public Game(Board board, int timeElapsed, String difficulty) {
@@ -13,10 +15,15 @@ public class Game implements CellListener {
         this.timeElapsed = timeElapsed;
         this.difficulty = difficulty;
         isWon = false;
+        isLost = false;
     }
 
     public void timeElapsed() {
         timeElapsed++;
+    }
+
+    public boolean isFirstRevealed() {
+        return isFirstRevealed;
     }
 
     public int getTimeElapsed() {
@@ -59,9 +66,20 @@ public class Game implements CellListener {
         board.flag(cell);
     }
 
+    public List<Cell> playReveal() {
+        //board.
+    }
+
     // kanskje game er cellListener -> game.rightClick() -> sjekk alt som i Controller.cellChanged() og basert på output frå checker, call Controller.setRevealGrapics/setFlagGraphics
     public boolean isLost() {
-        return false;
+        for (int y = 0; y < board.getCols(); y++) {
+            for (int x = 0; x < board.getRows(); x++) {
+                if (board.getCellAt(y, x).isRevealed() && board.getCellAt(y, x).isMine()) {
+                    
+                }
+            }
+        }
+        
     }
 
     @Override

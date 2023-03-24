@@ -30,4 +30,5 @@ public class MinesweeperApp extends Application {
 
 
 // Start timer ved første click/ if not started start() for right/left click event
-// smartare mine-velging
+// smartare mine-velging, sett ex 70 celle fordel slik at akkurat 70, mulig
+// ha cell changed i  game og la play returnere liste Cell ... cells, ha change graphics på alle

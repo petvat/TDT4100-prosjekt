@@ -8,6 +8,7 @@ public class Board {
     private double mineDensity;
     private int minesTotal;
     private int minesLeft;
+    //NORMAL
 
     public Board(int ySize, int xSize) {
         minesLeft = 0;
@@ -30,7 +31,7 @@ public class Board {
         // Sett opp grid og legg til mine
         for (int y = 0; y < getRows(); y++) {
             for (int x = 0; x < getCols(); x++) {
-                Cell cell = new Cell(y, x, Math.random() <= mineDensity);
+                Cell cell = new Cell(y, x, Math.random() < mineDensity);
                 grid[y][x] = cell;
                 // Samle miner til minesTotal
                 if (cell.isMine()) {
@@ -85,9 +86,12 @@ public class Board {
             cell.update();
             return;
         }
+        // Grunn til at reveal her: rekursiv computeadjacents. Løysing:
+        // computeadjacents/-minecount i board i init og reveal/flag i cell
         // nonMinesLeft--
         List<Cell> adjacents = computeAdjacents(cell);
         int adjacentMineCount = computeAdjacentMineCount(adjacents);
+        // setAdjacents(computeAdjacents(cell))
         cell.setAdjacentMineCount(adjacentMineCount);
         cell.update();
         // Viss ingen miner
@@ -140,9 +144,6 @@ public class Board {
             if (isValidCoordinate(adjacentY, adjacentX)) {
                 Cell adjCell = getCellAt(adjacentY, adjacentX);
                 adjacents.add(adjCell);
-                if (!adjCell.isRevealed()) {
-                    // unødvendig, fordi sjekker over
-                }
             } else {
                 continue;
             }
