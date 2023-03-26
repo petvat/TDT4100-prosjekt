@@ -6,7 +6,6 @@ import java.util.Random;
 
 public class Board {
     private Cell[][] grid;
-    private double mineDensity;
     private int minesTotal;
     private int minesLeft;
     // NORMAL

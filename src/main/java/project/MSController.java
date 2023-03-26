@@ -31,6 +31,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
@@ -43,30 +44,30 @@ public class MSController implements Initializable, CellListener {
     public static final int VH = 800;
     public static final int VW = 800;
     public static final int CELL_SIZE = 40;
-    public int X_SIZE = VW / CELL_SIZE;
-    public int Y_SIZE = VH / CELL_SIZE;
+    public static int X_SIZE = VW / CELL_SIZE;
+    public static int Y_SIZE = VH / CELL_SIZE;
+    public int TOP_BAR_HEIGHT = 30;
     public int MINE_COUNT = 75;
+
     private Image mineImg = new Image(getClass().getResourceAsStream("/project/img/MineIcon50px.png"));
     private Image cellImg = new Image(getClass().getResourceAsStream("/project/img/mineTile25px.png"));
     private Image FlaggedImg = new Image(getClass().getResourceAsStream("/project/img/Flagged.png"));
     private Font pixelFont = Font.loadFont(
             MSController.class.getResource("/project/font/upheavtt.ttf").toExternalForm(),
             26);
-
     private Map<Cell, StackPane> cellMap;
     private Game game;
     private GameSaveHandler saver;
     private Timeline timeline;
     private Stage stage;
     private Scene scene;
-    /// !!!
     private Parent parent;
-
-    // treng berre board, -> gå inn i board -> ha en "sjekker" som går igjennom alle
-    // Cell og set opp grafikk etter det
 
     @FXML
     private AnchorPane root;
+
+    @FXML
+    private HBox bar;
 
     @FXML
     private TextField filename;
@@ -112,6 +113,7 @@ public class MSController implements Initializable, CellListener {
         loadBox.setItems(list);
     }
 
+    // FLAGG UT
     private void startTimer(Game game) {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             game.timeElapsed();
@@ -121,6 +123,7 @@ public class MSController implements Initializable, CellListener {
         timeline.play();
     }
 
+    // FLAGG UT
     private List<String> setSlots() {
         // BUG KAN TRYKKE PÅ WOW, SUCH EMPTY
         File folder = new File("src/main/resources/project/saves/");
@@ -146,8 +149,8 @@ public class MSController implements Initializable, CellListener {
     }
 
     public void handleNewGame(int ySize, int xSize, int mines) {
-        this.Y_SIZE = ySize;
-        this.X_SIZE = xSize;
+        MSController.Y_SIZE = ySize;
+        MSController.X_SIZE = xSize;
         this.MINE_COUNT = mines;
         timeline.stop();
         initialize(null, null);
@@ -171,8 +174,10 @@ public class MSController implements Initializable, CellListener {
                 StackPane stack = new StackPane(btn, txt);
 
                 Cell cell = bd.getCellAt(y, x);
-                if (!cell.getListeners().contains(this)) {
-                    cell.addChangeListener(this);
+                if (cell.getListeners() != null) {
+                    if (!cell.getListeners().contains(this)) {
+                        cell.addChangeListener(this);
+                    }
                 }
 
                 // Lag map for å finne igjen stack frå cell
@@ -230,22 +235,6 @@ public class MSController implements Initializable, CellListener {
         scene = new Scene(parent);
         stage.setScene(scene);
         stage.show();
-
-        // rotete
-        /*
-         * game = new Game(new Board(Y_SIZE, X_SIZE), 0, "NORMAL");
-         * game.setName(null);
-         * Board bd = game.getBoard();
-         * bd.init(game.getDifficulty());
-         * drawBoard(bd);
-         * System.out.println(Integer.toString(bd.getMinesLeft()));
-         * // DRITA
-         * timeline.stop(); //
-         * //timer.setText("TIME  ");
-         * updateMineCount(bd);
-         * startTimer(game);
-         * System.out.println(game.getName());
-         */
     }
 
     @FXML
@@ -274,9 +263,6 @@ public class MSController implements Initializable, CellListener {
 
     @FXML
     public void handleLoad() {
-        // ENTEN LOAD(FILE, GAME) FOR Å SLEPPE Å LAGE NYTT GAME
-        // PROS: ENKELT Å FIKSE, CONS: GAME BOARD-STORLEIK MÅ VERE FIXED
-        // ELLER DRAWBOARD() HER
         Object selectedSavedFile = loadBox.getSelectionModel().getSelectedItem();
         if (selectedSavedFile == null)
             return;
@@ -294,20 +280,33 @@ public class MSController implements Initializable, CellListener {
             updateMineCount(bd);
             startTimer(game);
             System.out.println(game.getName());
-            // HANDLE REINITIALISATION OF CELLS EASY WAY
-            // ser no at scuffed med controller implements listener, fordi dette må vere her
             for (int y = 0; y < bd.getCols(); y++) {
                 for (int x = 0; x < bd.getRows(); x++) {
                     bd.getCellAt(y, x).update();
                 }
             }
+            Y_SIZE = bd.getRows();
+            X_SIZE = bd.getCols();
             // dynamisk, umulig?
             // scene.setHeight(CELL_SIZE * bd.getRows())
             // PSEUDO FIKS!!!
             // rart, stem fjern
-            stage = (Stage) grid.getScene().getWindow();
-            stage.setWidth(CELL_SIZE * bd.getCols());
-            stage.setHeight(CELL_SIZE * bd.getRows() + 30);
+            stage = (Stage) root.getScene().getWindow();
+            // double newVH = CELL_SIZE * Y_SIZE + 30;
+            // double newVW = CELL_SIZE * X_SIZE;
+            // Scene scene = root.getScene();
+            // Scene newScene = new Scene(scene.getRoot(), newVW, newVH);
+            // Set the new scene on the stage
+            // stage.setScene(newScene);
+            //Scene scene = root.getScene();
+            //scene.getHeight();
+            //stage.setWidth(CELL_SIZE * X_SIZE + 10);
+            //stage.setHeight(CELL_SIZE * Y_SIZE + 70);
+            // root.setPrefSize(CELL_SIZE * bd.getCols(), CELL_SIZE * bd.getRows() + 30);
+            // scene = new Scene(root);
+            // stage.setWidth funka best so langt -> kanskje scrap,
+
+            // VALG - ENTEN FIXED SCENE ELLER HA EIN SCENE CREATOR
         } catch (FileNotFoundException e) {
             System.out.println("File not found." + e);
         }
@@ -369,9 +368,5 @@ public class MSController implements Initializable, CellListener {
 
     public void updateMineCount(Board bd) {
         mineCount.setText("MINES: " + Integer.toString(bd.getMinesLeft()));
-    }
-
-    public void updateTimer() {
-
     }
 }

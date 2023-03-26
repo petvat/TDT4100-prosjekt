@@ -12,7 +12,7 @@
    <children>
       <BorderPane id="border" fx:id="border">
          <top>
-            <HBox id="top" prefHeight="27.0" prefWidth="328.0" BorderPane.alignment="CENTER">
+            <HBox id="top" fx:id="bar" prefHeight="27.0" prefWidth="328.0" BorderPane.alignment="CENTER">
                <children>
                   <Region prefHeight="27.0" prefWidth="24.0" />
                   <Text id="timer" fx:id="timer" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text" text="TIME" wrappingWidth="101.97653579711914">

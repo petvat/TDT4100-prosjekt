@@ -21,11 +21,11 @@ public class GameSaveHandler {
         }
         try (PrintWriter wr = new PrintWriter(file)) {
             Board bd = game.getBoard();
-            String gameInfo = String.format("%d,%d,%d,%d,%d,%d", bd.getCols(), bd.getRows(), game.getTimeElapsed(),
+            String gameInfo = String.format("%d,%d,%d,%d,%d,%d", bd.getRows(), bd.getCols(), game.getTimeElapsed(),
                     bd.getMinesLeft(), game.getMineCount(), game.isFirstRevealed() ? 1 : 0);
             wr.print(gameInfo);
-            for (int y = 0; y < bd.getCols(); y++) {
-                for (int x = 0; x < bd.getRows(); x++) {
+            for (int y = 0; y < bd.getRows(); y++) {
+                for (int x = 0; x < bd.getCols(); x++) {
                     wr.print("\n");
                     Cell cell = bd.getCellAt(y, x);
                     String cellBools = String.format("%d,%d,%d,%d", cell.isMine() ? 1 : 0, cell.isFlagged() ? 1 : 0,
@@ -45,14 +45,14 @@ public class GameSaveHandler {
         File file = new File(PATH + filename + EXTENSION);
         try (Scanner sc = new Scanner(file)) {
             String[] ps = sc.nextLine().split(",");
-            int cols = Integer.parseInt(ps[0]);
-            int rows = Integer.parseInt(ps[1]);
+            int rows = Integer.parseInt(ps[0]);
+            int cols = Integer.parseInt(ps[1]);
             int timeElapsed = Integer.parseInt(ps[2]);
             int minesLeft = Integer.parseInt(ps[3]);
             int minesTotal = Integer.parseInt(ps[4]);
             boolean isFirstRevealed = Integer.parseInt(ps[5]) == 1 ? true : false;
 
-            Board bd = new Board(cols, rows);
+            Board bd = new Board(rows, cols);
             // retarda løysing
             bd.setMinesTotal(minesTotal);
             bd.setMinesLeft(minesLeft);
