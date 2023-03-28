@@ -249,13 +249,15 @@ public class MSController implements Initializable, CellListener {
             bd.forEachCell(cell -> cell.update());
             Y_SIZE = bd.getRows();
             X_SIZE = bd.getCols();
-            startTimer(game);
             if (game.isLost()) {
                 System.out.println("DEEMESS");
                 drawLost();
-            }
-            if (game.isWon()) {
+                timer.setText("TIME: " + Integer.toString(game.getTimeElapsed()));
+            } else if (game.isWon()) {
                 drawWon();
+                timer.setText("TIME: " + Integer.toString(game.getTimeElapsed()));
+            } else {
+                startTimer(game);
             }
             stage = (Stage) root.getScene().getWindow();
             stage.setWidth(CELL_SIZE * X_SIZE + 10);
