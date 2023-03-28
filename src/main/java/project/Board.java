@@ -31,6 +31,7 @@ public class Board {
         }
     }
 
+    /* 
     public void ensureSafeFirstRevealed(Cell cell) {
         if (cell.isMine()) {
             cell.setIsMine(false);
@@ -50,6 +51,7 @@ public class Board {
             }
         }
     }
+    */
 
     public Cell findRandomNonMineCell() {
         Random r = new Random();
@@ -171,7 +173,7 @@ public class Board {
         return adjacents;
     }
 
-    public static int computeAdjacentMineCount(List<Cell> adjacents) {
+    public int computeAdjacentMineCount(List<Cell> adjacents) {
         int adjacentMineCount = 0;
         for (Cell adjacent : adjacents) {
             if (adjacent.isMine())

@@ -1,5 +1,7 @@
 package project;
 
+import java.util.List;
+
 public class Game {
     private int timeElapsed;
     private Board board;
@@ -30,11 +32,36 @@ public class Game {
         return isFirstRevealed;
     }
 
+    /*
+     * public void ensureSafeFirstRevealed(Cell cell) {
+     * // rar delegation
+     * board.ensureSafeFirstRevealed(cell);
+     * setFirstRevealed(true);
+     * }
+     */
+
     public void ensureSafeFirstRevealed(Cell cell) {
-        // rar delegation
-        board.ensureSafeFirstRevealed(cell);
+        if (cell.isMine()) {
+            cell.setIsMine(false);
+            board.findRandomNonMineCell().setIsMine(true);
+        }
+        List<Cell> adjacents = board.computeAdjacents(cell);
+        if (board.computeAdjacentMineCount(adjacents) != 0) {
+            for (Cell adjacent : adjacents) {
+                if (adjacent.isMine()) {
+                    adjacent.setIsMine(false);
+                    Cell randCell = board.findRandomNonMineCell();
+                    while (adjacents.contains(randCell)) {
+                        randCell = board.findRandomNonMineCell();
+                    }
+                    randCell.setIsMine(true);
+                }
+            }
+        }
         setFirstRevealed(true);
     }
+
+    // DISCUSS -> FLAG/REVEAL HER
 
     public void setFirstRevealed(boolean isFirstRevealed) {
         this.isFirstRevealed = isFirstRevealed;
@@ -83,6 +110,7 @@ public class Game {
     // kanskje game er cellListener -> game.rightClick() -> sjekk alt som i
     // Controller.cellChanged() og basert på output frå checker, call
     // Controller.setRevealGrapics/setFlagGraphics
+    // LETTARE VISS REVEAL ER HER
     public boolean isLost() {
         for (int y = 0; y < board.getRows(); y++) {
             for (int x = 0; x < board.getCols(); x++) {

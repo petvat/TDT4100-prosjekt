@@ -22,6 +22,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -92,8 +93,6 @@ public class MSController implements Initializable, CellListener {
 
     private GridPane grid;
 
-    @FXML
-
     // NEW GAME
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -109,8 +108,15 @@ public class MSController implements Initializable, CellListener {
         updateMineCount(bd);
         border.setCenter(grid);
         startTimer(game);
-        ObservableList<String> list = FXCollections.observableArrayList(setSlots());
-        loadBox.setItems(list);
+        ObservableList<String> list = FXCollections.observableArrayList(saver.setSlots());
+        if (list != null) {
+            loadBox.setItems(list);
+        }
+        // scene.heightProperty().bind(root.heightProperty());
+        // BURDE FUNGERE: new Scene(root); stage.setScene MEN stage er NULL??
+
+        // HUSK ENDREA APPLICATION, VH + VH !!!
+        // Sjuk tanke, ikkje ha initialize?
     }
 
     // FLAGG UT
@@ -124,29 +130,6 @@ public class MSController implements Initializable, CellListener {
     }
 
     // FLAGG UT
-    private List<String> setSlots() {
-        // BUG KAN TRYKKE PÅ WOW, SUCH EMPTY
-        File folder = new File("src/main/resources/project/saves/");
-        List<String> slots = new ArrayList<>();
-        System.out.println(folder.listFiles());
-        if (folder.listFiles() != null) {
-            File[] lst = folder.listFiles();
-            for (File file : lst) {
-                if (file.isFile()) {
-                    String filename = file.getName();
-                    String name = filename.substring(0, filename.length() - 5);
-                    System.out.println(name);
-                    slots.add(name);
-                }
-            }
-        }
-        if (slots.isEmpty()) {
-            slots.add("Wow, such empty ...");
-            // enklaste fjern denne ELLER syte for removeSave()
-            // legge til ved scenebuilder og fjern etter første save
-        }
-        return slots;
-    }
 
     public void handleNewGame(int ySize, int xSize, int mines) {
         MSController.Y_SIZE = ySize;
@@ -253,11 +236,18 @@ public class MSController implements Initializable, CellListener {
         }
         try {
             saver.save(game);
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found." + e);
+        } catch (IOException ioe) {
+            System.out.println("Error during saving ..." + ioe);
+            game.setName(null);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Save Failed");
+            alert.setHeaderText("Could not save file");
+            alert.setContentText("There was an error saving the file. Please check the file name and try again.");
+            alert.showAndWait();
+
         }
         System.out.println(game.getName());
-        ObservableList<String> list = FXCollections.observableArrayList(setSlots());
+        ObservableList<String> list = FXCollections.observableArrayList(saver.setSlots());
         loadBox.setItems(list);
     }
 
@@ -280,8 +270,8 @@ public class MSController implements Initializable, CellListener {
             updateMineCount(bd);
             startTimer(game);
             System.out.println(game.getName());
-            for (int y = 0; y < bd.getCols(); y++) {
-                for (int x = 0; x < bd.getRows(); x++) {
+            for (int y = 0; y < bd.getRows(); y++) {
+                for (int x = 0; x < bd.getCols(); x++) {
                     bd.getCellAt(y, x).update();
                 }
             }
@@ -298,10 +288,11 @@ public class MSController implements Initializable, CellListener {
             // Scene newScene = new Scene(scene.getRoot(), newVW, newVH);
             // Set the new scene on the stage
             // stage.setScene(newScene);
-            //Scene scene = root.getScene();
-            //scene.getHeight();
-            //stage.setWidth(CELL_SIZE * X_SIZE + 10);
-            //stage.setHeight(CELL_SIZE * Y_SIZE + 70);
+            // Scene scene = root.getScene();
+            // scene.getHeight();
+            // ROOT.GETHEIGHT()
+            stage.setWidth(CELL_SIZE * X_SIZE + 10);
+            stage.setHeight(CELL_SIZE * Y_SIZE + 70);
             // root.setPrefSize(CELL_SIZE * bd.getCols(), CELL_SIZE * bd.getRows() + 30);
             // scene = new Scene(root);
             // stage.setWidth funka best so langt -> kanskje scrap,

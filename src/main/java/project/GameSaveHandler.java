@@ -4,19 +4,23 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GameSaveHandler {
     public static final String EXTENSION = ".msfx";
     public static final String PATH = "src/main/resources/project/saves/";
 
-    public void save(Game game) throws FileNotFoundException {
+    public void save(Game game) throws IOException {
         File file = new File(getPath(game.getName()));
         if (!file.exists()) {
             try {
                 file.createNewFile();
             } catch (IOException ioe) {
-                System.out.println("File could not get created");
+                throw new IOException("File could not get created" + ioe);
             }
         }
         try (PrintWriter wr = new PrintWriter(file)) {
@@ -36,8 +40,9 @@ public class GameSaveHandler {
                 }
             }
             wr.close();
-        } catch (Exception e) {
-            System.out.println("could not save file. " + e);
+        } catch (IOException ioe) {
+            file.delete();
+            throw new FileNotFoundException("File not found." + ioe);
         }
     }
 
@@ -84,6 +89,30 @@ public class GameSaveHandler {
 
     private static String getPath(String filename) {
         return (PATH + filename + EXTENSION);
+    }
+
+    public List<String> setSlots() {
+        // BUG KAN TRYKKE PÅ WOW, SUCH EMPTY
+        File folder = new File("src/main/resources/project/saves/");
+        List<String> slots = new ArrayList<>();
+        System.out.println(folder.listFiles());
+        if (folder.listFiles() != null) {
+            File[] lst = folder.listFiles();
+            for (File file : lst) {
+                if (file.isFile()) {
+                    String filename = file.getName();
+                    String name = filename.substring(0, filename.length() - 5);
+                    System.out.println(name);
+                    slots.add(name);
+                }
+            }
+        }
+        // if (slots.isEmpty()) {
+        // slots.add("Wow, such empty ...");
+        // enklaste fjern denne ELLER syte for removeSave()
+        // legge til ved scenebuilder og fjern etter første save
+        // }
+        return slots;
     }
 
 }
