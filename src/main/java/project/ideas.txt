@@ -54,3 +54,20 @@
 // else if ("TRUE" && !cell.isRevealed()) {
 // cell.reveal();
 // }
+
+
+
+
+
+
+// game.playInteractionReveal(Cell cell) (returns List<Cell>) static
+                        // return all affected cells after interaction
+                        // for all affected cells, updateGraphics(Cell cell)
+                        // må ha bd.reveal() returns List<Cell>?
+                        // HADDE VORE BEST viss board ikkje blei referert til her i det heile,
+                        // controller-game-board-cell
+                        // KUNNE gått game.CellChanged(Cell cell) returns Cell ... cells
+                        // hadde vore best men vanskeleg å lagre alle andre celler og sende dei til
+                        // controller
+                        // komplisert men samle alle med flag action -> alle etter dette er med i liste,
+                        // change graphics til alle i liste, static buffer fyll opp i game

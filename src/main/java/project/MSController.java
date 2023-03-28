@@ -1,15 +1,13 @@
 package project;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
@@ -19,12 +17,14 @@ import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
@@ -49,7 +49,6 @@ public class MSController implements Initializable, CellListener {
     public static int Y_SIZE = VH / CELL_SIZE;
     public int TOP_BAR_HEIGHT = 30;
     public int MINE_COUNT = 75;
-
     private Image mineImg = new Image(getClass().getResourceAsStream("/project/img/MineIcon50px.png"));
     private Image cellImg = new Image(getClass().getResourceAsStream("/project/img/mineTile25px.png"));
     private Image FlaggedImg = new Image(getClass().getResourceAsStream("/project/img/Flagged.png"));
@@ -63,6 +62,9 @@ public class MSController implements Initializable, CellListener {
     private Stage stage;
     private Scene scene;
     private Parent parent;
+
+    @FXML
+    private Label gameOverLabel;
 
     @FXML
     private AnchorPane root;
@@ -83,7 +85,7 @@ public class MSController implements Initializable, CellListener {
     private Button saveBtn;
 
     @FXML
-    private Button reset;
+    private Button newGameBtn;
 
     @FXML
     private BorderPane border;
@@ -97,29 +99,24 @@ public class MSController implements Initializable, CellListener {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         grid = new GridPane();
-        saver = new GameSaveHandler();
-        game = new Game(new Board(Y_SIZE, X_SIZE), 0, MINE_COUNT);
-        game.setName(null);
-        // NEW GAME
-        Board bd = game.getBoard();
-        // litt snodig
-        bd.init(game.getMineCount());
-        drawBoard(bd);
-        updateMineCount(bd);
         border.setCenter(grid);
+
+        saver = new GameSaveHandler();
+        game = new Game(Y_SIZE, X_SIZE, 0, MINE_COUNT);
+        Board board = game.getBoard();
+        board.init();
+        drawBoard(board);
+        updateMineCount();
         startTimer(game);
+
+        gameOverLabel.setVisible(false);
+
         ObservableList<String> list = FXCollections.observableArrayList(saver.setSlots());
         if (list != null) {
             loadBox.setItems(list);
         }
-        // scene.heightProperty().bind(root.heightProperty());
-        // BURDE FUNGERE: new Scene(root); stage.setScene MEN stage er NULL??
-
-        // HUSK ENDREA APPLICATION, VH + VH !!!
-        // Sjuk tanke, ikkje ha initialize?
     }
 
-    // FLAGG UT
     private void startTimer(Game game) {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             game.timeElapsed();
@@ -129,94 +126,74 @@ public class MSController implements Initializable, CellListener {
         timeline.play();
     }
 
-    // FLAGG UT
-
+    // DUPLIKAT NAMN
     public void handleNewGame(int ySize, int xSize, int mines) {
-        MSController.Y_SIZE = ySize;
-        MSController.X_SIZE = xSize;
+        Y_SIZE = ySize;
+        X_SIZE = xSize;
         this.MINE_COUNT = mines;
         timeline.stop();
         initialize(null, null);
         game.setName(null);
     }
 
-    private void drawBoard(Board bd) {
+    private void drawBoard(Board board) {
         grid.getChildren().clear();
         cellMap = new HashMap<Cell, StackPane>();
         // Lag Cell-grafikk
-        for (int y = 0; y < bd.getRows(); y++) {
-            for (int x = 0; x < bd.getCols(); x++) {
-                Rectangle btn = new Rectangle(CELL_SIZE, CELL_SIZE);
-                Text txt = new Text();
-
-                btn.setFill(new ImagePattern(cellImg));
-                txt.setFont(pixelFont);
-                txt.setText("");
-
-                // Grafisk representasjon av Cell består av StackPane av rect og txt
-                StackPane stack = new StackPane(btn, txt);
-
-                Cell cell = bd.getCellAt(y, x);
-                if (cell.getListeners() != null) {
-                    if (!cell.getListeners().contains(this)) {
-                        cell.addChangeListener(this);
-                    }
+        board.forEachCell(cell -> {
+            if (cell.getListeners() != null) {
+                if (!cell.getListeners().contains(this)) {
+                    cell.addChangeListener(this);
                 }
-
-                // Lag map for å finne igjen stack frå cell
-                cellMap.put(cell, stack);
-
-                // Bind Cell til brukar-interaksjon
-                stack.setOnMouseClicked(e -> {
-                    if (e.getButton() == MouseButton.PRIMARY) {
-                        // game.playInteractionReveal(Cell cell) (returns List<Cell>) static
-                        // return all affected cells after interaction
-                        // for all affected cells, updateGraphics(Cell cell)
-                        // må ha bd.reveal() returns List<Cell>?
-                        // HADDE VORE BEST viss board ikkje blei referert til her i det heile,
-                        // controller-game-board-cell
-                        // KUNNE gått game.CellChanged(Cell cell) returns Cell ... cells
-                        // hadde vore best men vanskeleg å lagre alle andre celler og sende dei til
-                        // controller
-                        // komplisert men samle alle med flag action -> alle etter dette er med i liste,
-                        // change graphics til alle i liste, static buffer fyll opp i game
-                        if (!game.isFirstRevealed()) {
-                            game.ensureSafeFirstRevealed(cell);
-                        }
-                        bd.reveal(cell);
-                        // workaround cell.isMine() -> drawLost()
-                        if (game.isWon()) {
-                            drawWon();
-                        } else if (game.isLost()) {
-                            // game.setLost();
-                            drawLost();
-                        }
-                    } else if (e.getButton() == MouseButton.SECONDARY) {
-                        bd.flag(cell);
-                        updateMineCount(bd);
-                    }
-                });
-                stack.setOnMouseEntered(e -> {
-                    btn.setTranslateX(0.5);
-                    btn.setTranslateY(0.5);
-                });
-                stack.setOnMouseExited(e -> {
-                    btn.setTranslateX(0);
-                    btn.setTranslateY(0);
-                });
-                grid.add(stack, x, y);
             }
-        }
+            grid.add(createCellRepresentation(cell), cell.getX(), cell.getY());
+        });
     }
 
-    // nytt namn
+    private StackPane createCellRepresentation(Cell cell) {
+        Rectangle rect = new Rectangle(CELL_SIZE, CELL_SIZE);
+        Text txt = new Text();
+        rect.setFill(new ImagePattern(cellImg));
+        txt.setFont(pixelFont);
+        txt.setText("");
+        // Grafisk representasjon av Cell består av StackPane av rect og txt
+        StackPane stack = new StackPane(rect, txt);
+        // Lag map for å finne igjen stack frå cell
+        cellMap.put(cell, stack);
+        // Bind Cell til brukar-interaksjon
+        stack.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.PRIMARY) {
+                game.reveal(cell);
+                if (game.isWon()) {
+                    drawWon();
+                } else if (game.isLost()) {
+                    System.out.println("FAFUCK");
+                    drawLost();
+                }
+            } else if (e.getButton() == MouseButton.SECONDARY) {
+                game.flag(cell);
+                updateMineCount();
+            }
+        });
+        stack.setOnMouseEntered(e -> {
+            rect.setTranslateX(0.5);
+            rect.setTranslateY(0.5);
+        });
+        stack.setOnMouseExited(e -> {
+            rect.setTranslateX(0);
+            rect.setTranslateY(0);
+        });
+        return stack;
+    }
+
     @FXML
-    public void handleReset(ActionEvent event) throws IOException {
+    public void handleNewGame(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/project/MenuScene1.fxml"));
         parent = loader.load();
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         scene = new Scene(parent);
         stage.setScene(scene);
+        stage.sizeToScene();
         stage.show();
     }
 
@@ -244,7 +221,6 @@ public class MSController implements Initializable, CellListener {
             alert.setHeaderText("Could not save file");
             alert.setContentText("There was an error saving the file. Please check the file name and try again.");
             alert.showAndWait();
-
         }
         System.out.println(game.getName());
         ObservableList<String> list = FXCollections.observableArrayList(saver.setSlots());
@@ -253,6 +229,9 @@ public class MSController implements Initializable, CellListener {
 
     @FXML
     public void handleLoad() {
+        gameOverLabel.setText("");
+        gameOverLabel.setVisible(false);
+
         Object selectedSavedFile = loadBox.getSelectionModel().getSelectedItem();
         if (selectedSavedFile == null)
             return;
@@ -265,52 +244,51 @@ public class MSController implements Initializable, CellListener {
             game.setName(file);
             Board bd = game.getBoard();
             drawBoard(bd);
-            // DRITA
             timeline.stop();
-            updateMineCount(bd);
-            startTimer(game);
-            System.out.println(game.getName());
-            for (int y = 0; y < bd.getRows(); y++) {
-                for (int x = 0; x < bd.getCols(); x++) {
-                    bd.getCellAt(y, x).update();
-                }
-            }
+            updateMineCount();
+            bd.forEachCell(cell -> cell.update());
             Y_SIZE = bd.getRows();
             X_SIZE = bd.getCols();
-            // dynamisk, umulig?
-            // scene.setHeight(CELL_SIZE * bd.getRows())
-            // PSEUDO FIKS!!!
-            // rart, stem fjern
+            startTimer(game);
+            if (game.isLost()) {
+                System.out.println("DEEMESS");
+                drawLost();
+            }
+            if (game.isWon()) {
+                drawWon();
+            }
             stage = (Stage) root.getScene().getWindow();
-            // double newVH = CELL_SIZE * Y_SIZE + 30;
-            // double newVW = CELL_SIZE * X_SIZE;
-            // Scene scene = root.getScene();
-            // Scene newScene = new Scene(scene.getRoot(), newVW, newVH);
-            // Set the new scene on the stage
-            // stage.setScene(newScene);
-            // Scene scene = root.getScene();
-            // scene.getHeight();
-            // ROOT.GETHEIGHT()
             stage.setWidth(CELL_SIZE * X_SIZE + 10);
             stage.setHeight(CELL_SIZE * Y_SIZE + 70);
-            // root.setPrefSize(CELL_SIZE * bd.getCols(), CELL_SIZE * bd.getRows() + 30);
-            // scene = new Scene(root);
-            // stage.setWidth funka best so langt -> kanskje scrap,
-
-            // VALG - ENTEN FIXED SCENE ELLER HA EIN SCENE CREATOR
         } catch (FileNotFoundException e) {
             System.out.println("File not found." + e);
         }
     }
 
     public void drawWon() {
-        System.out.println("WON!! YE");
+        timeline.stop();
+        cellMap.forEach((key, value) -> value.setDisable(true));
+
+        gameOverLabel.setText("YOU WON!");
+        gameOverLabel.setTranslateY(20);
+
+        gameOverLabel.setVisible(true);
+        timeline.stop();
     }
 
     public void drawLost() {
-        System.out.println("Lost");
-        // kryss viss flag og !isMine
-        // opne alle mines
+        timeline.stop();
+        cellMap.forEach((key, value) -> {
+            value.setDisable(true);
+            if (key.isMine()) {
+                key.setRevealed(true);
+                key.update();
+            }
+        });
+        gameOverLabel.setTranslateY(20);
+        ;
+        gameOverLabel.setText("GAME OVER ...");
+        gameOverLabel.setVisible(true);
     }
 
     @Override
@@ -357,7 +335,7 @@ public class MSController implements Initializable, CellListener {
         }
     }
 
-    public void updateMineCount(Board bd) {
-        mineCount.setText("MINES: " + Integer.toString(bd.getMinesLeft()));
+    public void updateMineCount() {
+        mineCount.setText("MINES: " + Integer.toString(game.getBoard().getMinesLeft()));
     }
 }

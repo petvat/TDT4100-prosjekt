@@ -6,3 +6,7 @@
   -fx-font-family: "Upheaval TT (BRK)";
   -fx-font-size: 14pt;
 }
+
+#gameOverLabel {
+  -fx-font-size: 30pt;
+}

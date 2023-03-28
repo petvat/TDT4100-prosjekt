@@ -61,6 +61,7 @@ public class MenuController implements Initializable {
         // MSController.CELL_SIZE * X/Y KAN FUNKE????
         scene = new Scene(root, MSController.CELL_SIZE * x, MSController.CELL_SIZE * y + 30);
         stage.setScene(scene);
+        stage.sizeToScene();
         stage.show();
 
         // YOOOOOOOOOOOOO KVIFOR FEIL HEIGHT/WIDTH

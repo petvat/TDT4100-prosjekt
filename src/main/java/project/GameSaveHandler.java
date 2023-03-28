@@ -7,8 +7,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class GameSaveHandler {
     public static final String EXTENSION = ".msfx";
@@ -25,8 +23,8 @@ public class GameSaveHandler {
         }
         try (PrintWriter wr = new PrintWriter(file)) {
             Board bd = game.getBoard();
-            String gameInfo = String.format("%d,%d,%d,%d,%d,%d", bd.getRows(), bd.getCols(), game.getTimeElapsed(),
-                    bd.getMinesLeft(), game.getMineCount(), game.isFirstRevealed() ? 1 : 0);
+            String gameInfo = String.format("%d,%d,%d,%d,%d,%d,%d,%d", bd.getRows(), bd.getCols(), game.getTimeElapsed(),
+                    bd.getMinesLeft(), bd.getMinesTotal(), game.isFirstRevealed() ? 1 : 0, game.isWon() ? 1 : 0, game.isLost() ? 1 : 0);
             wr.print(gameInfo);
             for (int y = 0; y < bd.getRows(); y++) {
                 for (int x = 0; x < bd.getCols(); x++) {
@@ -56,10 +54,13 @@ public class GameSaveHandler {
             int minesLeft = Integer.parseInt(ps[3]);
             int minesTotal = Integer.parseInt(ps[4]);
             boolean isFirstRevealed = Integer.parseInt(ps[5]) == 1 ? true : false;
+            boolean isWon = Integer.parseInt(ps[6]) == 1 ? true : false;
+            boolean isLost = Integer.parseInt(ps[7]) == 1 ? true : false;
 
-            Board bd = new Board(rows, cols);
+            Game game = new Game(rows, cols, timeElapsed, minesTotal);
+            // Board bd = new Board(rows, cols);
+            Board bd = game.getBoard();
             // retarda løysing
-            bd.setMinesTotal(minesTotal);
             bd.setMinesLeft(minesLeft);
             while (sc.hasNextLine()) {
                 String[] parts = sc.nextLine().split(":");
@@ -81,8 +82,10 @@ public class GameSaveHandler {
                 bd.getGrid()[y][x] = cell;
             }
             sc.close();
-            Game game = new Game(bd, timeElapsed, minesTotal);
+            // Game game = new Game(bd, timeElapsed, minesTotal);
             game.setFirstRevealed(isFirstRevealed);
+            game.setLost(isLost);
+            game.setWon(isWon);
             return game;
         }
     }

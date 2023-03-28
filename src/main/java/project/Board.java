@@ -3,22 +3,22 @@ package project;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
 public class Board {
     private Cell[][] grid;
     private int minesTotal;
     private int minesLeft;
-    // NORMAL
+    private int revealedNonMineCellCount;
 
-    public Board(int ySize, int xSize) {
+    public Board(int ySize, int xSize, int minesTotal) {
         grid = new Cell[ySize][xSize];
+        revealedNonMineCellCount = 0;
+        this.minesTotal = minesTotal;
     }
 
-    // Init board med vanskegrad ie minetettleik
-    public void init(int mines) {
-        minesLeft = mines;
-        minesTotal = mines;
-        // Sett opp grid og legg til mine
+    public void init() {
+        minesLeft = minesTotal;
         for (int y = 0; y < getRows(); y++) {
             for (int x = 0; x < getCols(); x++) {
                 Cell cell = new Cell(y, x);
@@ -31,7 +31,88 @@ public class Board {
         }
     }
 
-    /* 
+    public void setMinesTotal(int minesTotal) {
+        this.minesTotal = minesTotal;
+    }
+
+    public void setMinesLeft(int minesLeft) {
+        this.minesLeft = minesLeft;
+    }
+
+    public int getMinesLeft() {
+        return minesLeft;
+    }
+
+    public int getMinesTotal() {
+        return minesTotal;
+    }
+
+    public Cell[][] getGrid() {
+        return grid;
+    }
+
+    public Cell getCellAt(int y, int x) {
+        return grid[y][x];
+    }
+
+    public int getRows() {
+        return grid.length;
+    }
+
+    public int getCols() {
+        return grid[0].length;
+    }
+
+    public int getRevealedNonMinCellCount() {
+        return revealedNonMineCellCount;
+    }
+
+    private boolean isValidCoordinate(int y, int x) {
+        return (y >= 0 && y < grid.length && x >= 0 && x < grid[y].length);
+    }
+
+    public void forEachCell(Consumer<Cell> cellConsumer) {
+        for (int y = 0; y < getRows(); y++) {
+            for (int x = 0; x < getCols(); x++) {
+                cellConsumer.accept(getCellAt(y, x));
+            }
+        }
+    }
+
+    public void reveal(Cell cell) {
+        if (cell.isFlagged())
+            return;
+        cell.setRevealed(true);
+        if (cell.isMine()) {
+            cell.update();
+            return;
+        }
+        revealedNonMineCellCount++;
+        List<Cell> adjacents = computeAdjacents(cell);
+        int adjacentMineCount = computeAdjacentMineCount(adjacents);
+        cell.setAdjacentMineCount(adjacentMineCount);
+        cell.update();
+        if (adjacentMineCount == 0) {
+            for (Cell adjacent : adjacents) {
+                if (!adjacent.isRevealed()) {
+                    reveal(adjacent);
+                }
+            }
+        }
+    }
+
+    public void flag(Cell cell) {
+        if (!cell.isFlagged()) {
+            cell.setFlagged(true);
+            minesLeft--;
+            cell.update();
+        } else if (cell.isFlagged()) {
+            cell.setFlagged(false);
+            minesLeft++;
+            cell.update();
+        }
+    }
+
     public void ensureSafeFirstRevealed(Cell cell) {
         if (cell.isMine()) {
             cell.setIsMine(false);
@@ -51,9 +132,8 @@ public class Board {
             }
         }
     }
-    */
 
-    public Cell findRandomNonMineCell() {
+    private Cell findRandomNonMineCell() {
         Random r = new Random();
         int y = r.nextInt(getRows());
         int x = r.nextInt(getCols());
@@ -62,83 +142,6 @@ public class Board {
             x = r.nextInt(getCols());
         }
         return getCellAt(y, x);
-    }
-
-    public void setMinesTotal(int minesTotal) {
-        this.minesTotal = minesTotal;
-    }
-
-    public void setMinesLeft(int minesLeft) {
-        this.minesLeft = minesLeft;
-    }
-
-    public int getMinesLeft() {
-        return minesLeft;
-    }
-
-    public int getMinesTotal() {
-        return minesTotal;
-    }
-
-    public boolean isValidCoordinate(int y, int x) {
-        return (y >= 0 && y < grid.length && x >= 0 && x < grid[y].length);
-    }
-
-    public Cell[][] getGrid() {
-        return grid;
-    }
-
-    public Cell getCellAt(int y, int x) {
-        return grid[y][x];
-    }
-
-    public int getRows() {
-        return grid.length;
-    }
-
-    public int getCols() {
-        return grid[0].length;
-    }
-
-    public void reveal(Cell cell) {
-        if (cell.isFlagged())
-            return;
-        cell.setRevealed(true);
-        if (cell.isMine()) {
-            cell.update();
-            return;
-        }
-        // Grunn til at reveal her: rekursiv computeadjacents. Løysing:
-        // computeadjacents/-minecount i board i init og reveal/flag i cell
-        // nonMinesLeft--
-        List<Cell> adjacents = computeAdjacents(cell);
-        int adjacentMineCount = computeAdjacentMineCount(adjacents);
-        // setAdjacents(computeAdjacents(cell))
-        cell.setAdjacentMineCount(adjacentMineCount);
-        cell.update();
-        // Viss ingen miner
-        if (adjacentMineCount == 0) {
-            for (Cell adjacent : adjacents) {
-                if (!adjacent.isRevealed()) {
-                    reveal(adjacent);
-                }
-            }
-        }
-    }
-
-    // Kanskje reveal/flag tilbake i Cell, meir logisk ...
-
-    public void flag(Cell cell) {
-        if (!cell.isFlagged()) {
-            cell.setFlagged(true);
-            minesLeft--;
-            cell.update();
-        } else if (cell.isFlagged()) {
-            cell.setFlagged(false);
-            minesLeft++;
-            cell.update();
-            // Korleis kan Controller bli informert av ny minecount?
-        }
     }
 
     public List<Cell> computeAdjacents(Cell cell) {

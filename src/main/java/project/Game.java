@@ -11,84 +11,44 @@ public class Game {
     private boolean isFirstRevealed;
     private String name;
 
-    public Game(Board board, int timeElapsed, int mines) {
-        this.board = board;
+    public Game(int ySize, int xSize, int timeElapsed, int mines) {
+        board = new Board(ySize, xSize, mines);
         this.timeElapsed = timeElapsed;
-        this.mines = mines;
-        isWon = false;
-        isLost = false;
         isFirstRevealed = false;
-    }
-
-    public void timeElapsed() {
-        timeElapsed++;
-    }
-
-    public int getMineCount() {
-        return mines;
+        isLost = false;
+        isWon = false;
+        name = null;
     }
 
     public boolean isFirstRevealed() {
         return isFirstRevealed;
     }
 
-    /*
-     * public void ensureSafeFirstRevealed(Cell cell) {
-     * // rar delegation
-     * board.ensureSafeFirstRevealed(cell);
-     * setFirstRevealed(true);
-     * }
-     */
-
-    public void ensureSafeFirstRevealed(Cell cell) {
-        if (cell.isMine()) {
-            cell.setIsMine(false);
-            board.findRandomNonMineCell().setIsMine(true);
-        }
-        List<Cell> adjacents = board.computeAdjacents(cell);
-        if (board.computeAdjacentMineCount(adjacents) != 0) {
-            for (Cell adjacent : adjacents) {
-                if (adjacent.isMine()) {
-                    adjacent.setIsMine(false);
-                    Cell randCell = board.findRandomNonMineCell();
-                    while (adjacents.contains(randCell)) {
-                        randCell = board.findRandomNonMineCell();
-                    }
-                    randCell.setIsMine(true);
-                }
-            }
-        }
-        setFirstRevealed(true);
-    }
-
-    // DISCUSS -> FLAG/REVEAL HER
-
     public void setFirstRevealed(boolean isFirstRevealed) {
         this.isFirstRevealed = isFirstRevealed;
     }
 
-    public int getTimeElapsed() {
-        return timeElapsed;
-    }
-
-    public Board getBoard() {
-        return board;
-    }
-
     public boolean isWon() {
-        int mines = board.getMinesTotal();
-        int cellsTotal = 0;
-        int revealedCells = 0;
-        // Gjer i board
-        for (int y = 0; y < board.getRows(); y++) {
-            for (int x = 0; x < board.getCols(); x++) {
-                cellsTotal++;
-                if (!board.getCellAt(y, x).isMine() && board.getCellAt(y, x).isRevealed()) {
-                    revealedCells++;
+        return isWon;
+    }
+
+    public void setWon(boolean isWon) {
+        this.isWon = isWon;
+        if (isWon) {
+            board.forEachCell(cell -> {
+                if (cell.isMine()) {
+                    cell.setRevealed(true);
                 }
-            }
+            });
         }
-        return (revealedCells + mines == cellsTotal);
+    }
+
+    public boolean isLost() {
+        return isLost;
+    }
+
+    public void setLost(boolean isLost) {
+        this.isLost = isLost;
     }
 
     public void setName(String name) {
@@ -99,50 +59,57 @@ public class Game {
         return name;
     }
 
-    public void play(Cell cell) {
-        board.flag(cell);
+    public void timeElapsed() {
+        timeElapsed++;
     }
 
-    public void playReveal() {
-        // board.
-    }
-
-    // kanskje game er cellListener -> game.rightClick() -> sjekk alt som i
-    // Controller.cellChanged() og basert på output frå checker, call
-    // Controller.setRevealGrapics/setFlagGraphics
-    // LETTARE VISS REVEAL ER HER
-    public boolean isLost() {
-        for (int y = 0; y < board.getRows(); y++) {
-            for (int x = 0; x < board.getCols(); x++) {
-                if (board.getCellAt(y, x).isMine() && board.getCellAt(y, x).isRevealed()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public void setLost() {
-        for (int y = 0; y < board.getCols(); y++) {
-            for (int x = 0; x < board.getRows(); x++) {
-                if (board.getCellAt(y, x).isMine() && board.getCellAt(y, x).isRevealed()) {
-                    board.reveal(board.getCellAt(y, x));
-                }
-                // set wrongly flagged, sikkert best i controller
-            }
-        }
-    }
     /*
-     * @Override
-     * public Cell cellChanged(Cell cell) {
-     * if (cell.isMine()) {
-     * isLost = true;
-     * }
-     * if (isWon) {
-     * //
-     * }
-     * // updateAdjacentMineCount()/ få mines left
-     * 
+     * public int getMinesTotal() {
+     * return board.getMinesTotal();
      * }
      */
+
+    /*
+     * public int getMinesLeft() {
+     * return board.getMinesLeft();
+     * }
+     */
+
+    /*
+     * public Cell getCellAt(int y, int x) {
+     * return board.getCellAt(y, x);
+     * }
+     */
+
+    public int getTimeElapsed() {
+        return timeElapsed;
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public void reveal(Cell cell) {
+        if (isWon() || isLost()) {
+            return;
+        }
+        if (!isFirstRevealed) {
+            board.ensureSafeFirstRevealed(cell);
+            setFirstRevealed(true);
+        }
+        board.reveal(cell);
+        if (cell.isMine() && !cell.isFlagged()) {
+            setLost(true);
+            // Betre i Board.getGame -> men innkapsling
+        } else if (board.getCols() * board.getRows() - board.getMinesTotal() == board.getRevealedNonMinCellCount()) {
+            setWon(true);
+        }
+    }
+
+    public void flag(Cell cell) {
+        if (isWon() || isLost()) {
+            return;
+        }
+        board.flag(cell);
+    }
 }

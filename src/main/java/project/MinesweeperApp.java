@@ -18,6 +18,8 @@ public class MinesweeperApp extends Application {
         primaryStage.setTitle("MinesweeperFX");
         primaryStage.getIcons().add(mineImg);
         primaryStage.setScene(new Scene(root)); // MSController.VH ++
+        // MSController.CELL_SIZE * MSController.X_SIZE,
+        // MSController.CELL_SIZE * MSController.Y_SIZE + 30
         primaryStage.show();
     }
 
