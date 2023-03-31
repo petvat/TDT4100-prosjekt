@@ -12,4 +12,5 @@ Testar
 
 
     GameSaveHandler
-        Ugylid filnamn -> Exception
+        Ugylid filnamn, tomt filnamn -> Exception
+        
