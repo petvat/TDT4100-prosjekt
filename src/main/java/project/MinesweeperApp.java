@@ -17,7 +17,8 @@ public class MinesweeperApp extends Application {
         Parent root = FXMLLoader.load((getClass().getResource("/project/MSmain.fxml")));
         primaryStage.setTitle("MinesweeperFX");
         primaryStage.getIcons().add(mineImg);
-        primaryStage.setScene(new Scene(root)); // MSController.VH ++
+        primaryStage.setScene(new Scene(root, MSController.CELL_SIZE * MSController.X_SIZE,
+                MSController.CELL_SIZE * MSController.Y_SIZE + 30)); // MSController.VH ++
         // MSController.CELL_SIZE * MSController.X_SIZE,
         // MSController.CELL_SIZE * MSController.Y_SIZE + 30
         primaryStage.show();

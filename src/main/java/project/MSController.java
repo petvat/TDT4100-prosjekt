@@ -199,6 +199,7 @@ public class MSController implements Initializable, CellListener {
 
     @FXML
     public void handleSave() {
+        String filename = null;
         if (game.getName() == null) {
             TextInputDialog tid = new TextInputDialog();
             tid.setTitle("Save game");
@@ -206,22 +207,25 @@ public class MSController implements Initializable, CellListener {
             Optional<String> result = tid.showAndWait();
 
             if (result.isPresent()) {
-                game.setName(result.get());
+                filename = result.get();
+                // game.setName(result.get());
             } else {
+                System.out.println("IPSI");
                 return;
             }
         }
         try {
-            saver.save(game);
-        } catch (IOException ioe) {
-            System.out.println("Error during saving ..." + ioe);
-            game.setName(null);
+            saver.save(game, filename);
+        } catch (IOException | IllegalArgumentException e) {
+            System.out.println("Error during saving ..." + e);
+            // game.setName(null);
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Save Failed");
             alert.setHeaderText("Could not save file");
             alert.setContentText("There was an error saving the file. Please check the file name and try again.");
             alert.showAndWait();
         }
+
         System.out.println(game.getName());
         ObservableList<String> list = FXCollections.observableArrayList(saver.setSlots());
         loadBox.setItems(list);

@@ -1,0 +1,15 @@
+Testar
+
+    Cell 
+    Board er laga riktig
+
+
+    Game er vunne
+    Game er tapt
+
+
+    Prøve å bruke reveal() når Game er vunne/tapt
+
+
+    GameSaveHandler
+        Ugylid filnamn -> Exception

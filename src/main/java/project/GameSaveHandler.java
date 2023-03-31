@@ -12,8 +12,11 @@ public class GameSaveHandler {
     public static final String EXTENSION = ".msfx";
     public static final String PATH = "src/main/resources/project/saves/";
 
-    public void save(Game game) throws IOException {
-        File file = new File(getPath(game.getName()));
+    public void save(Game game, String filename) throws IOException {
+        if (filename.isEmpty()) {
+            throw new IllegalArgumentException("Filename can not be null");
+        }
+        File file = new File(getPath(filename));
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -23,8 +26,10 @@ public class GameSaveHandler {
         }
         try (PrintWriter wr = new PrintWriter(file)) {
             Board bd = game.getBoard();
-            String gameInfo = String.format("%d,%d,%d,%d,%d,%d,%d,%d", bd.getRows(), bd.getCols(), game.getTimeElapsed(),
-                    bd.getMinesLeft(), bd.getMinesTotal(), game.isFirstRevealed() ? 1 : 0, game.isWon() ? 1 : 0, game.isLost() ? 1 : 0);
+            String gameInfo = String.format("%d,%d,%d,%d,%d,%d,%d,%d", bd.getRows(), bd.getCols(),
+                    game.getTimeElapsed(),
+                    bd.getMinesLeft(), bd.getMinesTotal(), game.isFirstRevealed() ? 1 : 0, game.isWon() ? 1 : 0,
+                    game.isLost() ? 1 : 0);
             wr.print(gameInfo);
             for (int y = 0; y < bd.getRows(); y++) {
                 for (int x = 0; x < bd.getCols(); x++) {
@@ -38,6 +43,9 @@ public class GameSaveHandler {
                 }
             }
             wr.close();
+            if (game.getName() != filename) {
+                game.setName(filename);
+            }
         } catch (IOException ioe) {
             file.delete();
             throw new FileNotFoundException("File not found." + ioe);
