@@ -12,11 +12,24 @@ public class Board {
     private int revealedNonMineCellCount;
 
     public Board(int ySize, int xSize, int minesTotal) {
+        if (ySize == 0 || xSize == 0 || minesTotal >= ySize * xSize)
+            throw new IllegalArgumentException();
         grid = new Cell[ySize][xSize];
         revealedNonMineCellCount = 0;
         this.minesTotal = minesTotal;
     }
+    // bør heite initRandomMines()
+    // viktig dokumentasjon: usikker på Board-innkapsling, korleis handtere filbehandling/ mine pos sjølvdefinert ikkje random
+    // customInit(Cell ... cells) {for -> (y,x): [y][x] = cells.get(i*)}
+    /*
+     * 
+     * customInit(List<Cell>) {
+     * for y for x {
+     * grid[x][y] = cells.get(i*)}
+     */
+    public void initWithoutCellState() {
 
+    }
     public void init() {
         minesLeft = minesTotal;
         for (int y = 0; y < getRows(); y++) {
@@ -31,9 +44,24 @@ public class Board {
         }
     }
 
-    public void setMinesTotal(int minesTotal) {
-        this.minesTotal = minesTotal;
+    public void initMines(int mines) {
+        minesTotal = mines;
+        minesLeft = mines;
+        for (int y = 0; y < getRows(); y++) {
+            for (int x = 0; x < getCols(); x++) {
+                Cell cell = new Cell(y, x);
+                cell.setIsMine(false);
+                grid[y][x] = cell;
+            }
+        }
+        for (int i = 0; i < minesTotal; i++) {
+            findRandomNonMineCell().setIsMine(true);
+        }
     }
+
+   /*  public void setMinesTotal(int minesTotal) {
+        this.minesTotal = minesTotal;
+    }*/
 
     public void setMinesLeft(int minesLeft) {
         this.minesLeft = minesLeft;
@@ -137,9 +165,13 @@ public class Board {
         Random r = new Random();
         int y = r.nextInt(getRows());
         int x = r.nextInt(getCols());
+        int attemptCount = 0;
         while (getCellAt(y, x).isMine()) {
             y = r.nextInt(getRows());
             x = r.nextInt(getCols());
+            if (attemptCount >= 100) {
+                break;
+            }
         }
         return getCellAt(y, x);
     }

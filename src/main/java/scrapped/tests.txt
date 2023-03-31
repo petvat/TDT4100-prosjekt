@@ -13,4 +13,8 @@ Testar
 
     GameSaveHandler
         Ugylid filnamn, tomt filnamn -> Exception
-        
+
+
+    Sjekk at totalMineCount = antall cell som er mine 
+
+    Board()

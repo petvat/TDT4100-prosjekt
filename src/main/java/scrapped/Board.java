@@ -137,10 +137,11 @@ public class Board {
         Random r = new Random();
         int y = r.nextInt(getRows());
         int x = r.nextInt(getCols());
+        int attemptCount = 0;
         while (getCellAt(y, x).isMine()) {
             y = r.nextInt(getRows());
             x = r.nextInt(getCols());
-        }
+         }
         return getCellAt(y, x);
     }
 
