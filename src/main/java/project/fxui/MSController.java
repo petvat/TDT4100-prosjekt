@@ -1,5 +1,11 @@
 package project.fxui;
 
+import project.model.Board;
+import project.model.Cell;
+import project.model.CellListener;
+import project.model.Game;
+import project.model.GameSaveHandler;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
@@ -14,11 +20,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.util.Duration;
-import project.model.Board;
-import project.model.Cell;
-import project.model.CellListener;
-import project.model.Game;
-import project.model.GameSaveHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -36,7 +37,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
@@ -69,31 +69,20 @@ public class MSController implements Initializable, CellListener {
 
     @FXML
     private Label gameOverLabel;
-
     @FXML
     private AnchorPane root;
-
-    @FXML
-    private HBox bar;
-
     @FXML
     private TextField filename;
-
     @FXML
     private Text timer;
-
     @FXML
     private Text mineCount;
-
     @FXML
     private Button saveBtn;
-
     @FXML
     private Button newGameBtn;
-
     @FXML
     private BorderPane border;
-
     @FXML
     private ComboBox<String> loadBox;
 
@@ -131,7 +120,7 @@ public class MSController implements Initializable, CellListener {
     }
 
     // DUPLIKAT NAMN
-    public void handleNewGame(int ySize, int xSize, int mines) {
+    public void initNewGame(int ySize, int xSize, int mines) {
         Y_SIZE = ySize;
         X_SIZE = xSize;
         this.MINE_COUNT = mines;
@@ -171,7 +160,6 @@ public class MSController implements Initializable, CellListener {
                 if (game.isWon()) {
                     drawWon();
                 } else if (game.isLost()) {
-                    System.out.println("FAFUCK");
                     drawLost();
                 }
             } else if (e.getButton() == MouseButton.SECONDARY) {
@@ -212,9 +200,7 @@ public class MSController implements Initializable, CellListener {
 
             if (result.isPresent()) {
                 filename = result.get();
-                // game.setName(result.get());
             } else {
-                System.out.println("IPSI");
                 return;
             }
         }
@@ -257,7 +243,6 @@ public class MSController implements Initializable, CellListener {
             Y_SIZE = bd.getRows();
             X_SIZE = bd.getCols();
             if (game.isLost()) {
-                System.out.println("DEEMESS");
                 drawLost();
                 timer.setText("TIME: " + Integer.toString(game.getTimeElapsed()));
             } else if (game.isWon()) {
@@ -295,7 +280,6 @@ public class MSController implements Initializable, CellListener {
             }
         });
         gameOverLabel.setTranslateY(20);
-        ;
         gameOverLabel.setText("GAME OVER ...");
         gameOverLabel.setVisible(true);
     }

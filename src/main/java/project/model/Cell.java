@@ -19,7 +19,6 @@ public class Cell {
         isRevealed = false;
         isFlagged = false;
         listeners = new ArrayList<>();
-
     }
 
     public int getY() {

@@ -98,7 +98,7 @@ public class GameSaveHandler {
         }
     }
 
-    private static String getPath(String filename) {
+    public String getPath(String filename) {
         return (PATH + filename + EXTENSION);
     }
 

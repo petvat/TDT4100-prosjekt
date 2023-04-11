@@ -2,6 +2,8 @@ package project.model;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -17,7 +19,9 @@ public class GameSaveHandlerTest {
     @BeforeEach
     void setUp() {
         game = new Game(10, 10, 0, 1);
+        game.getBoard().init();
     }
+    //GameListener??
 
     @Test
     void testEmptyInputThrowsIllegalArgumentException() {
@@ -41,10 +45,14 @@ public class GameSaveHandlerTest {
     void testCreateFile() {
         GameSaveHandler gsh = new GameSaveHandler();
         String filename = "validName";
-        gsh.save(game, filename);
-        File file = new File(gsh.getPath(filename));
-        assertTrue(file.exists());
-        file.delete();
+        try {
+            gsh.save(game, filename);
+            File file = new File(gsh.getPath(filename));
+            assertTrue(file.exists());
+            file.delete();
+        } catch (Exception e) {
+            fail("Unexpected exception thrown: " + e.getMessage());
+        }
     }
 
     @Test

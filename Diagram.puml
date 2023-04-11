@@ -1,0 +1,91 @@
+@startuml "diagram"
+
+
+Controller o-- Game
+Board *-- Cell
+Game o-- Board
+CellListener <|-- Controller
+Cell <|.. CellListener
+
+class Controller {
+
+}
+
+class CellListener {
+
+}
+
+class Game {
+    - Board board
+    - int TimeElapsed
+    - boolean isWon, isLost
+    - isFirstRevealed
+    - String name
+
+    + boolean isFirstRevealed()
+    + void setFirstrevealed()
+    + boolean isWon()
+    + boolean isLost()
+    + void setWon()
+    + void setLost()
+    + void setName(String)
+    + String getName()
+    + void TimeElapsed()
+    + int getTimeElapsed()
+    + Board getBoard()
+    + void reveal(Cell)
+    + void flag(Cell cell)
+}
+
+class Board {
+    __ private data __
+    - Cell[][] grid
+    - int minesTotal
+    - int minesLeft
+    - int getRevealedNonMineCellCount
+    + void init()
+    + int getMinesTotal()
+    + int getMinesLeft()
+    + void setMinesLeft(int)
+    + Cell[][] getGrid()
+    + Cell getCellAt(int, int)
+    + int getRows()
+    + int getCols()
+    + int getRevealedNonMineCellCount()
+    - boolean isValidCoordinate(int, int)
+    + void forEachCell(Consumer<Cell>)
+    + void reveal(Cell)
+    + void flag(Cell)
+    + void ensureSafeFirstRevealed(Cell cell)
+    - Cell findRandomNonMineCell()
+    + List<Cell> computeAdjacents(Cell)
+    - int computeAdjacentMineCount()
+}
+
+class Cell {
+    - int x, y
+    - boolean isMine, isFlagged, isRevealed
+    - List<CellListener> listeners
+    - int adjacentMineCount
+
+    + int getY()
+    + int getX()
+    + boolean isFlagged()
+    + boolean isRevealed()
+    + boolean isMine()
+    + void setflagged(boolean)
+    + void setRevealed(boolean)
+    + void setIsMine(boolean)
+    + setAdjacentMineCount(int)
+    + void update()
+    + List<CellListener> getListeners()
+    + void addChangeListener(CellListener)
+    + void removeChangeListener(Cell Listener)
+
+}
+
+
+
+
+@enduml
+

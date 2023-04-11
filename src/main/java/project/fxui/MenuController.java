@@ -54,7 +54,7 @@ public class MenuController implements Initializable {
         root = loader.load();
         MSController msController = loader.getController();
         // x, y????
-        msController.handleNewGame(y, x, mines);
+        msController.initNewGame(y, x, mines);
 
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         // dynamisk, umulig?
