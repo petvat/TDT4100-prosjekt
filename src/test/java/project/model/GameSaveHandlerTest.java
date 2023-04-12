@@ -10,8 +10,6 @@ import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import project.model.Game;
-import project.model.GameSaveHandler;
 
 public class GameSaveHandlerTest {
     Game game;
@@ -21,7 +19,6 @@ public class GameSaveHandlerTest {
         game = new Game(10, 10, 0, 1);
         game.getBoard().init();
     }
-    //GameListener??
 
     @Test
     void testEmptyInputThrowsIllegalArgumentException() {

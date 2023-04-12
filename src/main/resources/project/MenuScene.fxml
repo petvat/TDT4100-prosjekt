@@ -24,6 +24,5 @@
          </center>
       </BorderPane>
       <Button fx:id="newGameBtn" layoutX="187.0" layoutY="288.0" mnemonicParsing="false" onAction="#createNewGame" prefHeight="45.0" prefWidth="247.0" text="CREATE NEW GAME" />
-      <Button fx:id="cancelBtn" layoutX="232.0" layoutY="344.0" mnemonicParsing="false" onAction="#cancel" prefHeight="38.0" prefWidth="155.0" text="CANCEL" />
    </children>
 </AnchorPane>

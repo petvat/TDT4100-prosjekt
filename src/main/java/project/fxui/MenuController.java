@@ -33,9 +33,6 @@ public class MenuController implements Initializable {
     @FXML
     Button newGameBtn;
 
-    @FXML
-    Button cancelBtn;
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         var product = Bindings.createIntegerBinding(() -> (int) (ySlider.getValue() * xSlider.getValue() / 4),
@@ -57,18 +54,11 @@ public class MenuController implements Initializable {
         msController.initNewGame(y, x, mines);
 
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        // dynamisk, umulig?
-        // MSController.CELL_SIZE * X/Y KAN FUNKE????
         scene = new Scene(root, MSController.CELL_SIZE * x, MSController.CELL_SIZE * y + 30);
         stage.setScene(scene);
         stage.sizeToScene();
         stage.show();
 
-        // YOOOOOOOOOOOOO KVIFOR FEIL HEIGHT/WIDTH
-    }
-
-    public void cancel(ActionEvent event) throws IOException {
-        System.out.println("CANT CANCEL SORRY");
     }
 
 }

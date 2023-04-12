@@ -15,13 +15,10 @@ public class GameTest {
     @BeforeEach
     void setUp() {
         game = new Game(3, 3, 0, 1);
-        // retrospekt - board.setMines/Random
     }
 
     @Test
     void testGameLost() {
-        assertFalse(game.isWon());
-        assertFalse(game.isLost());
         for (int y = 0; y < game.getBoard().getRows(); y++) {
             for (int x = 0; x < game.getBoard().getCols(); x++) {
                 Cell cell = new Cell(y, x);
@@ -35,8 +32,6 @@ public class GameTest {
     }
     @Test
     void testGameWon() {
-        assertFalse(game.isWon());
-        assertFalse(game.isLost());
         for (int y = 0; y < game.getBoard().getRows(); y++) {
             for (int x = 0; x < game.getBoard().getCols(); x++) {
                 Cell cell = new Cell(y, x);

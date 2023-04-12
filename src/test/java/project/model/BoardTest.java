@@ -31,7 +31,6 @@ public class BoardTest {
 
     @Test
     void testFlag() {
-        // b.init(int mines) er betre ser eg i ettertid
         Board b = new Board(3, 3, 1);
         b.init();
         assertEquals(1, b.getMinesLeft());
@@ -39,10 +38,6 @@ public class BoardTest {
         assertTrue(b.getCellAt(1, 1).isFlagged());
         assertEquals(0, b.getMinesLeft());
     }
-
-    // HA EN initWithoutCellState()
-    // bd.getCellAt(y,x).setRevealed().setFlagged.setIsMine()
-    // I GameSaveHandler load()
 
     @Test
     void testReveal() {

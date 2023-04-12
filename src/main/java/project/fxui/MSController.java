@@ -88,7 +88,6 @@ public class MSController implements Initializable, CellListener {
 
     private GridPane grid;
 
-    // NEW GAME
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         grid = new GridPane();
@@ -119,7 +118,6 @@ public class MSController implements Initializable, CellListener {
         timeline.play();
     }
 
-    // DUPLIKAT NAMN
     public void initNewGame(int ySize, int xSize, int mines) {
         Y_SIZE = ySize;
         X_SIZE = xSize;
@@ -208,7 +206,6 @@ public class MSController implements Initializable, CellListener {
             saver.save(game, filename);
         } catch (IOException | IllegalArgumentException e) {
             System.out.println("Error during saving ..." + e);
-            // game.setName(null);
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Save Failed");
             alert.setHeaderText("Could not save file");

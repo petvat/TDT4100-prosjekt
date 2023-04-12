@@ -1,0 +1,32 @@
+@startuml "Sequence diagram for right click on cell"
+
+User -> UI : right-click on cell
+UI -> Game : reveal(Cell)
+Game -> Board : reveal(Cell)
+    Board -> Cell : setRevealed(true)
+    UI <- Cell : cellChanged(this)
+    User <- UI : change graphics
+        Board <- Cell : isMine(boolean)
+
+    opt Cell is not mine
+        Board -> Board : computeAdjacents(Cell)
+        Board -> Board : computeAdjacentMineCount()
+        opt computeAdjacentMineCount = 0
+            loop for all adjacent cells
+            Board -> Board : reveal(Cell)
+            note right: This reveals more cells recursively
+            end
+        end
+    end
+UI -> Game : isLost()
+UI <- Game : boolean
+opt boolean = true
+User <- UI : change graphics
+end
+UI -> Game : isWon()
+UI <- Game : boolean
+opt boolean = true
+User <- UI : change graphics
+end
+
+@enduml
