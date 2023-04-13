@@ -226,6 +226,7 @@ public class MSController implements Initializable, CellListener {
         if (selectedSavedFile == null)
             return;
         String file = selectedSavedFile.toString();
+        // liten bug når trykker på current file i load-menu, ikkje reset, må loade anna fil, så tilbake
         try {
             if (saver.load(file) == null || file == game.getName()) {
                 return;

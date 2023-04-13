@@ -41,7 +41,7 @@ public class BoardTest {
 
     @Test
     void testReveal() {
-        Board b = new Board(3, 3, 1);
+        Board b = new Board(3, 3, 8);
         for (int y = 0; y < b.getRows(); y++) {
             for (int x = 0; x < b.getCols(); x++) {
                 Cell cell = new Cell(y, x);

@@ -66,9 +66,7 @@ public class GameSaveHandler {
             boolean isLost = Integer.parseInt(ps[7]) == 1 ? true : false;
 
             Game game = new Game(rows, cols, timeElapsed, minesTotal);
-            // Board bd = new Board(rows, cols);
             Board bd = game.getBoard();
-            // retarda løysing
             bd.setMinesLeft(minesLeft);
             while (sc.hasNextLine()) {
                 String[] parts = sc.nextLine().split(":");
@@ -82,7 +80,6 @@ public class GameSaveHandler {
                 int adjacentMineCount = Integer.parseInt(bools[3]);
 
                 Cell cell = new Cell(y, x);
-                // cell.setBoard(bd);
                 cell.setRevealed(isRevealed);
                 cell.setFlagged(isFlagged);
                 cell.setIsMine(isMine);
@@ -90,7 +87,6 @@ public class GameSaveHandler {
                 bd.getGrid()[y][x] = cell;
             }
             sc.close();
-            // Game game = new Game(bd, timeElapsed, minesTotal);
             game.setFirstRevealed(isFirstRevealed);
             game.setLost(isLost);
             game.setWon(isWon);
