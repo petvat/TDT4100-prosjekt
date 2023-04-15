@@ -34,7 +34,7 @@ I `Board` ligg logikken for å endre tilstandane til cellene, meir spesifikt log
 
 ![skjermbilete av UI](seq_diagram.PNG)
 
-Diagrammet vist over skildrar prosessen bak når brukaren vel å høgreklikke på ei celle i spelet. `Opt` viser optional prosess dersom kravet (i klammene) er oppfylt.
+Diagrammet vist over skildrar prosessen bak når brukaren vel å høgreklikke på ei celle i spelet. `Opt` viser optional prosess dersom kravet (i klammene) er oppfylt. Rekursivt kall i loopen.
 
 ## Del 3: Spørsmål
 
@@ -47,4 +47,6 @@ Diagrammet vist over skildrar prosessen bak når brukaren vel å høgreklikke p�
     Eit anna problem er at ein kan instansiere eit `Board`-objekt med eit gitt antal mines, utan at celle i `Board.grid` faktisk er oppdatert etter dette. Først etter at `Board.init()` er kalt, vil mine count i `Board` samsvarar med antal Cell-objekt som er miner i `Board.grid`. Grunnen til at eg har gjort det slik, er at `init()` konstrukterer eit nytt brett der miner er tilfeldig plassert i griden. Denne vert ikkje kalla i konstruktøren fordi det er i somme tilfelle hensiktmessig å initalisere eit brett utan tilfeldig plassering av miner. Tildømes i `load()`-metoden i `GameSaveHandler`, der initialiseringa av brettet vert gjort "manuelt" frå fil-data (sjå /java/project/model/GameSaveHandler.java frå linje 55) og ikkje tilfeldig.
     Ei løysing kunne vore å ha to konstruktørar i `Board`, der den eine initialiserer eit brett med tilfeldige plasseringar og den andre tillèt å plassere minene etter eige ønske.
 
-4.  Testane tar for seg dei viktigaste funksjonane til modell-klassene `Board` og `Game` som tar for seg logikken i spelet, samt `GameSaveHandler` som tar for seg lagring til/frå fil. I `BoardTest` har eg fokusert på at flagging og reveal-algoritma fungerer som den skal, og i `GameTest` har eg testa at vunnen og tapt tilstand fungerer. I `GameSaveHandlerTest` har eg testa at systemet skiljer mellom lovlege og ulovlege filnamn. Eg har òg testa at ein får tilbake det same `Game`-objektet når lagrar det til fil og lastar det ned ved Load-funksjonen.
+    Å innskrenke logikken i `Controller`, tildømes ved `isLost()` og `isWon()`
+
+4.  Testane tar for seg dei viktigaste funksjonane til modell-klassene `Board` og `Game` som tar for seg logikken i spelet, samt `GameSaveHandler` som tar for seg lagring til/frå fil. I `BoardTest` har eg fokusert på at flagging og reveal-algoritma fungerer som den skal, og i `GameTest` har eg testa at vunnen og tapt tilstand fungerer. I `GameSaveHandlerTest` har eg testa at systemet skiljer mellom lovlege og ulovlege filnamn. Eg har òg testa at ein får tilbake det same `Game`-objektet når ein lagrar spelet til fil og lastar det ned igjen ved Load-funksjonen.

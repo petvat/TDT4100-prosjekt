@@ -1,32 +1,86 @@
 @startuml "Sequence diagram for right click on cell"
 
 User -> UI : right-click on cell
+activate User
 UI -> Game : reveal(Cell)
+activate UI
+activate Game
+
+Game -> Game : isFirstRevealed()
+opt isFirstRevealed = false
+    activate Board
+    Game --> Board : ensureFirstSafeRevealed(Cell)
+    Board -> Cell : isMine()
+        activate Cell
+    Board <-- Cell : boolean
+    opt isMine() = true
+        Board --> rCell ** : findRandomNonMineCell()
+        Board --> rCell : setIsMine(true)
+        activate rCell
+        deactivate rCell
+        Board --> Cell : setIsMine(false)
+        deactivate Cell
+        deactivate Board
+    end
+end 
 Game -> Board : reveal(Cell)
-    Board -> Cell : setRevealed(true)
-    UI <- Cell : cellChanged(this)
-    User <- UI : change graphics
-        Board <- Cell : isMine(boolean)
+activate Board
+    Board --> Cell : setRevealed(true)
+        activate Cell
+    Cell -> Cell : alertListeners()
+    UI <-- Cell : cellChanged(this)
+    User <-- UI : change graphics
+    deactivate UI
+    deactivate User
+        Board -> Cell : isMine()
+        Board <-- Cell : boolean
+        deactivate Cell
 
     opt Cell is not mine
         Board -> Board : computeAdjacents(Cell)
-        Board -> Board : computeAdjacentMineCount()
+        Board -> Board : adjacentMineCount()
         opt computeAdjacentMineCount = 0
             loop for all adjacent cells
             Board -> Board : reveal(Cell)
+                activate Board
             note right: This reveals more cells recursively
             end
         end
     end
+    deactivate Board
+    deactivate Board
+
+    Game --> Game : checkWon()
+    Game --> Game : checkLost()
+    opt checkWon() = true
+        Game -> Game : setWon(true)
+    end
+    opt 
+    opt checkLost() = true
+        Game -> Game : setLost(true)
+    end
+    opt 
+
+deactivate Game
+
+    
+    
 UI -> Game : isLost()
-UI <- Game : boolean
+activate UI
+activate Game
+UI <-- Game : boolean
 opt boolean = true
-User <- UI : change graphics
+User <-- UI : change graphics
+activate User
+deactivate User
 end
 UI -> Game : isWon()
-UI <- Game : boolean
+UI <-- Game : boolean
 opt boolean = true
-User <- UI : change graphics
+deactivate Game
+activate User
+User <-- UI : change graphics
+deactivate User
 end
 
 @enduml
