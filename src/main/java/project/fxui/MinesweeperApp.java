@@ -8,10 +8,10 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class MinesweeperApp extends Application {
-    private Image mineImg = new Image(getClass().getResourceAsStream("/project/img/MineIcon50px.png"));
-    
+
     @Override
     public void start(Stage primaryStage) throws Exception {
+        Image mineImg = new Image(getClass().getResourceAsStream("/project/img/MineIcon50px.png"));
         Parent root = FXMLLoader.load((getClass().getResource("/project/MainScene.fxml")));
         primaryStage.setTitle("MinesweeperFX");
         primaryStage.getIcons().add(mineImg);
@@ -19,6 +19,7 @@ public class MinesweeperApp extends Application {
                 MSController.CELL_SIZE * MSController.Y_SIZE + 30));
         primaryStage.show();
     }
+
     public static void main(String[] args) {
         launch(args);
     }
