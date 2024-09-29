@@ -60,24 +60,6 @@ public class Game {
         timeElapsed++;
     }
 
-    /*
-     * public int getMinesTotal() {
-     * return board.getMinesTotal();
-     * }
-     */
-
-    /*
-     * public int getMinesLeft() {
-     * return board.getMinesLeft();
-     * }
-     */
-
-    /*
-     * public Cell getCellAt(int y, int x) {
-     * return board.getCellAt(y, x);
-     * }
-     */
-
     public int getTimeElapsed() {
         return timeElapsed;
     }
