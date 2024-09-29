@@ -18,7 +18,7 @@ Modellen består dei tre klassene - `Cell`, `Board` og `Game`. `Cell` represente
 
 I `Board` ligg logikken for å endre tilstandane til cellene, meir spesifikt logikken for å opne og flagge celler. For opning av celler inneberer dette logikk for å rekne ut alle cellene som skal opnast, gjennom rekursivt metodekall. I tillegg har klassa som oppgåva å halde styr på det totale antalet miner på brettet, og miner att trekt ifrå flagga celler (identisk til den originale versjonen av Minesweeper).
 
-`Game` instansierer eit `Board`-objekt, i tillegg til å syte for ein tidtakar. Den er tenkt som ein "high-level" abstraksjon av sjølve spelet. Ideen var at `Board` skulle stå for endringar av tilstandar til celler, utan noko kjennskap til spelet og tilstandar som tapt/vunne. |||Eg valte å ikkje ha listener/ unødvendig å lytte til alle endringar til alle celler, når berre opning av første celle er relevant for å vurdere tilstand tapt/vunne|||
+`Game` instansierer eit `Board`-objekt, i tillegg til å syte for ein tidtakar. Den er tenkt som ein "high-level" abstraksjon av sjølve spelet. Ideen var at `Board` skulle stå for endringar av tilstandar til celler, utan noko kjennskap til spelet og tilstandar som tapt/vunne.
 
 #### "Utility"-klasser
 
